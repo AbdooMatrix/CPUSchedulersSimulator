@@ -45,6 +45,7 @@ public class CPUSchedulersSimulator {
             case 1:
                 PriorityScheduler priorityScheduler = new PriorityScheduler();
                 schedule = priorityScheduler.schedule(processes, contextSwitchingTime);
+                priorityScheduler.printResults(processes);
                 break;
             case 2:
                 // Call SJF Scheduler and get execution order
