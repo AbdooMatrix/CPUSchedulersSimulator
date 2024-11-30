@@ -1,8 +1,10 @@
 import algorithms.PriorityScheduler;
 import models.Process;
-
+import javax.swing.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+import models.ProcessExecution;
 
 public class CPUSchedulersSimulator {
     public static void main(String[] args) {
@@ -22,7 +24,7 @@ public class CPUSchedulersSimulator {
             int burstTime = scanner.nextInt();
             System.out.print("Priority: ");
             int priority = scanner.nextInt();
-            System.out.print("Color: ");
+            System.out.print("Color (Hex code, e.g., #FF5733): ");
             String color = scanner.next();
             processes.add(new Process(name, arrivalTime, burstTime, priority, color));
         }
@@ -37,31 +39,36 @@ public class CPUSchedulersSimulator {
         System.out.print("Enter context switching time: ");
         int contextSwitchingTime = scanner.nextInt();
 
-        if (choice == 4) {
-            System.out.print("Enter Round Robin Quantum for FCAI: ");
-            int quantum = scanner.nextInt();
-            // Call FCAI Scheduler with quantum and contextSwitchingTime
-        }
+        List<ProcessExecution> schedule = null;
 
         switch (choice) {
             case 1:
-                // Call Priority Scheduler
-                PriorityScheduler scheduler = new PriorityScheduler();
-                scheduler.schedule(processes);
+                PriorityScheduler priorityScheduler = new PriorityScheduler();
+                schedule = priorityScheduler.schedule(processes, contextSwitchingTime);
                 break;
             case 2:
-                // Call SJF Scheduler
+                // Call SJF Scheduler and get execution order
                 break;
             case 3:
-                // Call SRTF Scheduler
+                // Call SRTF Scheduler and get execution order
                 break;
             case 4:
-                // Call FCAI Scheduler
+                System.out.print("Enter Round Robin Quantum for FCAI: ");
+                int quantum = scanner.nextInt();
+                // Call FCAI Scheduler and get execution order
                 break;
             default:
                 System.out.println("Invalid choice.");
         }
 
-        // Display outputs: Execution order, Waiting Time, Turnaround Time, Averages
+        if (schedule != null) {
+            // Display the Gantt chart
+            JFrame frame = new JFrame("Gantt Chart");
+            GanttChart chart = new GanttChart(schedule);
+            frame.add(chart);
+            frame.setSize(800, 200);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setVisible(true);
+        }
     }
 }
