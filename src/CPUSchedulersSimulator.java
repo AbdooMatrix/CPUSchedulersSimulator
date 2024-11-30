@@ -64,7 +64,7 @@ public class CPUSchedulersSimulator {
 
         if (schedule != null) {
             // Display the Gantt chart
-            JFrame frame = new JFrame("Gantt Chart");
+            JFrame frame = new JFrame("Graphical representation of Processes execution order");
             GanttChart chart = new GanttChart(schedule);
             frame.add(chart);
             frame.setSize(800, 200);
