@@ -1,6 +1,6 @@
 package models;
 
-import java.awt.*;
+import java.awt.Color;
 
 public class Process {
     private String name;
@@ -8,6 +8,7 @@ public class Process {
     private int burstTime;
     private int priority;
     private String color;
+    private int completionTime;
 
     public Process(String name, int arrivalTime, int burstTime, int priority, String color) {
         this.name = name;
@@ -35,5 +36,21 @@ public class Process {
 
     public Color getColor() {
         return Color.decode(color);
+    }
+
+    public int getCompletionTime() {
+        return completionTime;
+    }
+
+    public void setCompletionTime(int completionTime) {
+        this.completionTime = completionTime;
+    }
+
+    public int getWaitingTime(int completionTime) {
+        return completionTime - arrivalTime - burstTime;
+    }
+
+    public int getTurnaroundTime(int completionTime) {
+        return completionTime - arrivalTime;
     }
 }
