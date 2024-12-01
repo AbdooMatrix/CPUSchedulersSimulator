@@ -62,14 +62,14 @@ public class CPUSchedulersSimulator {
                 System.out.println("Invalid choice.");
         }
 
-        if (schedule != null) {
-            // Display the Gantt chart
-            JFrame frame = new JFrame("Graphical representation of Processes execution order");
-            GanttChart chart = new GanttChart(schedule);
-            frame.add(chart);
-            frame.setSize(800, 200);
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setVisible(true);
-        }
+//        if (schedule != null) {
+//            // Display the Gantt chart
+//            JFrame frame = new JFrame("Graphical representation of Processes execution order");
+//            GanttChart chart = new GanttChart(schedule);
+//            frame.add(chart);
+//            frame.setSize(800, 200);
+//            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//            frame.setVisible(true);
+//        }
     }
 }
