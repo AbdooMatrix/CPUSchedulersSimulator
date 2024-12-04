@@ -36,6 +36,7 @@ public class CPUSchedulersSimulator {
         System.out.println("2. Non-preemptive Shortest Job First (SJF)");
         System.out.println("3. Shortest Remaining Time First (SRTF)");
         System.out.println("4. FCAI Scheduling");
+        System.out.print("Please enter your choice: ");
         int choice = scanner.nextInt();
 
         if (choice < 1 || choice > 4) {
