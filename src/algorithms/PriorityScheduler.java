@@ -59,7 +59,9 @@ public class PriorityScheduler {
         System.out.println("Process Execution Order:");
 
         // Print execution order
-        executionOrder.forEach(pe -> System.out.println(pe.getProcessName()));
+        for (ProcessExecution pe : executionOrder) {
+            System.out.println(pe.getProcessName());
+        }
 
         // Print individual process results (waiting time, turnaround time)
         for (Process p : processes) {
@@ -78,16 +80,19 @@ public class PriorityScheduler {
     }
 
     public double calculateAverageWaitingTime(List<Process> processes) {
-        return processes.stream()
-                .mapToInt(p -> p.getWaitingTime(p.getCompletionTime()))
-                .average()
-                .orElse(0);
+        int totalWaitingTime = 0;
+        for (Process p : processes) {
+            totalWaitingTime += p.getWaitingTime(p.getCompletionTime());
+        }
+        double averageWaitingTime = (double) totalWaitingTime / processes.size();
+        return averageWaitingTime;
     }
 
     public double calculateAverageTurnaroundTime(List<Process> processes) {
-        return processes.stream()
-                .mapToInt(p -> p.getTurnaroundTime(p.getCompletionTime()))
-                .average()
-                .orElse(0);
+        int totalTurnaroundTime = 0;
+        for (Process p : processes) {
+            totalTurnaroundTime += p.getTurnaroundTime(p.getCompletionTime());
+        }
+        return (double) totalTurnaroundTime / processes.size();
     }
 }

@@ -4,12 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bb1c55d4-15b5-437e-8f9e-b0cc1a0cc28f" name="Changes" comment="adjusted the processes graph">
+    <list default="true" id="bb1c55d4-15b5-437e-8f9e-b0cc1a0cc28f" name="Changes" comment="made some edits on the PriorityScheduler">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/CPUSchedulersSimulator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CPUSchedulersSimulator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/SchedulingGraph.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/SchedulingGraph.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/algorithms/PriorityScheduler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/algorithms/PriorityScheduler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/ProcessExecution.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/ProcessExecution.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -96,7 +93,7 @@
       <workItem from="1733001380387" duration="114000" />
       <workItem from="1733063820355" duration="53000" />
       <workItem from="1733072197901" duration="4510000" />
-      <workItem from="1733306856050" duration="13970000" />
+      <workItem from="1733306856050" duration="14670000" />
     </task>
     <task id="LOCAL-00001" summary="edit">
       <option name="closed" value="true" />
@@ -194,7 +191,15 @@
       <option name="project" value="LOCAL" />
       <updated>1733318829634</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="made some edits on the PriorityScheduler">
+      <option name="closed" value="true" />
+      <created>1733322873488</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1733322873488</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -215,6 +220,7 @@
     <MESSAGE value="edit" />
     <MESSAGE value="adjusted the processes bars in graph" />
     <MESSAGE value="adjusted the processes graph" />
-    <option name="LAST_COMMIT_MESSAGE" value="adjusted the processes graph" />
+    <MESSAGE value="made some edits on the PriorityScheduler" />
+    <option name="LAST_COMMIT_MESSAGE" value="made some edits on the PriorityScheduler" />
   </component>
 </project>
