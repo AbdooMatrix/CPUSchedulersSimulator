@@ -8,18 +8,15 @@ public class ProcessExecution {
     public Color color;
     public int pid;
     public int priority;
+    public int startTime; // Added to track when execution starts
 
-    // Constructor with PID and Priority
-    public ProcessExecution(String processName, int duration, Color color, int pid, int priority) {
+    // Updated Constructor
+    public ProcessExecution(String processName, int duration, Color color, int pid, int priority, int startTime) {
         this.processName = processName;
         this.duration = duration;
         this.color = color;
         this.pid = pid;
         this.priority = priority;
-    }
-
-    // Constructor without PID and Priority for backward compatibility
-    public ProcessExecution(String processName, int duration, Color color) {
-        this(processName, duration, color, 0, 0); // Default PID and priority
+        this.startTime = startTime;
     }
 }

@@ -13,18 +13,26 @@ public class PriorityScheduler {
         int currentTime = 0;
 
         for (Process process : processes) {
+            // Wait for the process to arrive
             if (process.getArrivalTime() > currentTime) {
-                currentTime = process.getArrivalTime(); // Waiting for the process to arrive
+                currentTime = process.getArrivalTime();
             }
 
-            // Add execution entry to the schedule (name, burst time, color)
-            executionOrder.add(new ProcessExecution(process.getName(), process.getBurstTime(), process.getColor()));
+            // Add execution entry with correct start time and duration
+            executionOrder.add(new ProcessExecution(
+                    process.getName(),
+                    process.getBurstTime(),
+                    process.getColor(),
+                    process.getPid(),
+                    process.getPriority(),
+                    currentTime // Add startTime here
+            ));
 
-            // Set completion time for the process
+            // Update process completion time
             currentTime += process.getBurstTime();
             process.setCompletionTime(currentTime);
 
-            // Add context switching time after each process execution
+            // Add context switching time
             currentTime += contextSwitchingTime;
         }
 
@@ -44,17 +52,24 @@ public class PriorityScheduler {
             System.out.println("Turnaround Time: " + turnaroundTime + '\n');
         }
 
-        double avgWait = processes.stream()
-                .mapToInt(p -> p.getWaitingTime(p.getCompletionTime()))
-                .average()
-                .orElse(0);
-
-        double avgTurnaround = processes.stream()
-                .mapToInt(p -> p.getTurnaroundTime(p.getCompletionTime()))
-                .average()
-                .orElse(0);
+        double avgWait = calculateAverageWaitingTime(processes);
+        double avgTurnaround = calculateAverageTurnaroundTime(processes);
 
         System.out.println("Average Waiting Time: " + avgWait);
         System.out.println("Average Turnaround Time: " + avgTurnaround);
+    }
+
+    public double calculateAverageWaitingTime(List<Process> processes) {
+        return processes.stream()
+                .mapToInt(p -> p.getWaitingTime(p.getCompletionTime()))
+                .average()
+                .orElse(0);
+    }
+
+    public double calculateAverageTurnaroundTime(List<Process> processes) {
+        return processes.stream()
+                .mapToInt(p -> p.getTurnaroundTime(p.getCompletionTime()))
+                .average()
+                .orElse(0);
     }
 }
