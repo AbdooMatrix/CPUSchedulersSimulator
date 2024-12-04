@@ -104,13 +104,27 @@ public class SchedulingGraph extends JPanel {
         JLabel titleLabel = new JLabel("Processes Information");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 20)); // Bigger and bolder font
         titleLabel.setForeground(Color.RED);
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT); // Center align the title label
         legendPanel.add(titleLabel);
 
         for (ProcessExecution exec : schedule) {
-            JLabel processLabel = new JLabel("Name: " + exec.processName + " | PID: " + exec.pid + " | Priority: " + exec.priority);
+            JPanel processInfoPanel = new JPanel();
+            processInfoPanel.setBackground(Color.DARK_GRAY);
+            processInfoPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+
+            JLabel colorLabel = new JLabel();
+            colorLabel.setOpaque(true);
+            colorLabel.setBackground(exec.color);
+            colorLabel.setPreferredSize(new Dimension(15, 15));
+
+            JLabel processLabel = new JLabel(String.format("Name: %s | PID: %s | Priority: %s", exec.processName, exec.pid, exec.priority));
             processLabel.setFont(new Font("Arial", Font.BOLD, 16)); // Bigger and bolder font
             processLabel.setForeground(Color.WHITE);
-            legendPanel.add(processLabel);
+
+            processInfoPanel.add(colorLabel);
+            processInfoPanel.add(processLabel);
+
+            legendPanel.add(processInfoPanel);
         }
 
         // Create the statistics panel

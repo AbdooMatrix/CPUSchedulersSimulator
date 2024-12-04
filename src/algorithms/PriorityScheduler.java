@@ -7,13 +7,29 @@ import java.util.List;
 
 public class PriorityScheduler {
     public List<ProcessExecution> schedule(List<Process> processes, int contextSwitchingTime) {
-        processes.sort((p1, p2) -> Integer.compare(p1.getPriority(), p2.getPriority()));
+        // Sort by priority first, then by arrival time if priorities are equal
+        processes.sort((p1, p2) -> {
+            // First, compare priority
+            int priorityCompare = Integer.compare(p1.getPriority(), p2.getPriority());
+            if (priorityCompare != 0) {
+                return priorityCompare;
+            }
+
+            // If priority is the same, compare arrival time
+            int arrivalCompare = Integer.compare(p1.getArrivalTime(), p2.getArrivalTime());
+            if (arrivalCompare != 0) {
+                return arrivalCompare;
+            }
+
+            // If both priority and arrival time are the same, compare burst time (shortest first)
+            return Integer.compare(p1.getBurstTime(), p2.getBurstTime());
+        });
 
         List<ProcessExecution> executionOrder = new ArrayList<>();
         int currentTime = 0;
 
         for (Process process : processes) {
-            // Wait for the process to arrive
+            // Wait for the process to arrive if necessary
             if (process.getArrivalTime() > currentTime) {
                 currentTime = process.getArrivalTime();
             }
@@ -32,16 +48,18 @@ public class PriorityScheduler {
             currentTime += process.getBurstTime();
             process.setCompletionTime(currentTime);
 
-            // Add context switching time
+            // Add context switching time (simulated after each process completes)
             currentTime += contextSwitchingTime;
         }
 
         return executionOrder;
     }
 
-    public void printResults(List<Process> processes) {
+    public void printResults(List<Process> processes, List<ProcessExecution> executionOrder) {
         System.out.println("Process Execution Order:");
-        processes.forEach(p -> System.out.println(p.getName()));
+
+        // Print execution order
+        executionOrder.forEach(pe -> System.out.println(pe.getProcessName()));
 
         // Print individual process results (waiting time, turnaround time)
         for (Process p : processes) {

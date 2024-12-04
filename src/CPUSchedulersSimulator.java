@@ -15,6 +15,7 @@ public class CPUSchedulersSimulator {
         System.out.print("Enter number of processes: ");
         int numProcesses = scanner.nextInt();
 
+        // Input processes
         for (int i = 0; i < numProcesses; i++) {
             System.out.println("Process " + (i + 1) + ":");
             System.out.print("Name: ");
@@ -53,25 +54,35 @@ public class CPUSchedulersSimulator {
 
         switch (choice) {
             case 1:
+                // Use PriorityScheduler
                 PriorityScheduler priorityScheduler = new PriorityScheduler();
                 schedule = priorityScheduler.schedule(processes, contextSwitchingTime);
                 averageWaitingTime = priorityScheduler.calculateAverageWaitingTime(processes);
                 averageTurnaroundTime = priorityScheduler.calculateAverageTurnaroundTime(processes);
-                priorityScheduler.printResults(processes);
+
+                // Print results (with execution order passed in)
+                priorityScheduler.printResults(processes, schedule);
                 break;
+
             case 2:
                 // Call SJF Scheduler and get execution order
+                // SJF scheduler code would go here
                 break;
+
             case 3:
                 // Call SRTF Scheduler and get execution order
+                // SRTF scheduler code would go here
                 break;
+
             case 4:
+                // FCAI Scheduling (assumed Round Robin or other method)
                 System.out.print("Enter Round Robin Quantum for FCAI: ");
                 int quantum = scanner.nextInt();
-                // Call FCAI Scheduler and get execution order
+                // FCAI scheduling code would go here
                 break;
         }
 
+        // If there is a valid schedule, pass it to GUI creation
         if (schedule != null) {
             SchedulingGraph.createAndShowGUI(
                     schedule,

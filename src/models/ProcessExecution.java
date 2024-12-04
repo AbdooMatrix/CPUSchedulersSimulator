@@ -19,4 +19,8 @@ public class ProcessExecution {
         this.priority = priority;
         this.startTime = startTime;
     }
+
+    public String getProcessName() {
+        return processName;
+    }
 }
