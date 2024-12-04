@@ -15,7 +15,6 @@ public class SchedulingGraph extends JPanel {
         this.scheduleName = scheduleName;
         this.averageWaitingTime = awt;
         this.averageTurnaroundTime = ata;
-        setPreferredSize(new Dimension(1400, 900));
         setBackground(Color.DARK_GRAY); // Revert background to original color
     }
 
@@ -34,12 +33,17 @@ public class SchedulingGraph extends JPanel {
         // Title
         g2d.setColor(Color.RED);
         g2d.setFont(new Font("Arial", Font.BOLD, 30)); // Bigger and bolder font
-        g2d.drawString("CPU Scheduling Graph", getWidth() / 3, 40);
+        g2d.drawString("CPU Scheduling Graph", xOffset, 40); // Move to the left side
 
         int maxTime = 0;
         for (ProcessExecution exec : schedule) {
             maxTime = Math.max(maxTime, exec.startTime + exec.duration);
         }
+
+        // Adjust the preferred size based on the number of processes and max time
+        int panelWidth = xOffset + (maxTime + 1) * timeUnitWidth + 100;
+        int panelHeight = yOffset + schedule.size() * barSpacing + 200;
+        setPreferredSize(new Dimension(panelWidth, panelHeight));
 
         // Draw Grid Lines
         g2d.setColor(new Color(100, 100, 100)); // Original grid line color
@@ -89,7 +93,7 @@ public class SchedulingGraph extends JPanel {
         // Create the grid panel
         SchedulingGraph gridPanel = new SchedulingGraph(schedule, scheduleName, awt, ata);
         JScrollPane scrollPane = new JScrollPane(gridPanel);
-        scrollPane.setPreferredSize(new Dimension(1200, 600));
+        scrollPane.setPreferredSize(new Dimension(1200, 800)); // Ensure scroll pane has a preferred size
 
         // Create the legend panel
         JPanel legendPanel = new JPanel();
@@ -141,7 +145,7 @@ public class SchedulingGraph extends JPanel {
         mainPanel.add(legendPanel, BorderLayout.EAST);
 
         frame.add(mainPanel);
-        frame.setSize(1400, 900);
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // Set to fullscreen
         frame.setVisible(true);
     }
 }
