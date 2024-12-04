@@ -1,10 +1,11 @@
 import algorithms.PriorityScheduler;
 import models.Process;
+import models.ProcessExecution;
+
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import models.ProcessExecution;
 
 public class CPUSchedulersSimulator {
     public static void main(String[] args) {
@@ -25,8 +26,9 @@ public class CPUSchedulersSimulator {
             System.out.print("Priority: ");
             int priority = scanner.nextInt();
             System.out.print("Color (Hex code, e.g., #FF5733): ");
-            String color = scanner.next();
-            processes.add(new Process(name, arrivalTime, burstTime, priority, color));
+            String colorHex = scanner.next();
+            int pid = i + 1; // Generate unique PID
+            processes.add(new Process(name, arrivalTime, burstTime, priority, colorHex, pid));
         }
 
         System.out.println("Select the Scheduling Algorithm:");
@@ -34,17 +36,27 @@ public class CPUSchedulersSimulator {
         System.out.println("2. Non-preemptive Shortest Job First (SJF)");
         System.out.println("3. Shortest Remaining Time First (SRTF)");
         System.out.println("4. FCAI Scheduling");
+        System.out.print("Please enter your choice: ");
         int choice = scanner.nextInt();
+
+        if (choice < 1 || choice > 4) {
+            System.out.println("Invalid choice. Exiting program.");
+            return;
+        }
 
         System.out.print("Enter context switching time: ");
         int contextSwitchingTime = scanner.nextInt();
 
         List<ProcessExecution> schedule = null;
+        double averageWaitingTime = 0;
+        double averageTurnaroundTime = 0;
 
         switch (choice) {
             case 1:
                 PriorityScheduler priorityScheduler = new PriorityScheduler();
                 schedule = priorityScheduler.schedule(processes, contextSwitchingTime);
+                averageWaitingTime = priorityScheduler.calculateAverageWaitingTime(processes);
+                averageTurnaroundTime = priorityScheduler.calculateAverageTurnaroundTime(processes);
                 priorityScheduler.printResults(processes);
                 break;
             case 2:
@@ -58,18 +70,15 @@ public class CPUSchedulersSimulator {
                 int quantum = scanner.nextInt();
                 // Call FCAI Scheduler and get execution order
                 break;
-            default:
-                System.out.println("Invalid choice.");
         }
 
-//        if (schedule != null) {
-//            // Display the Gantt chart
-//            JFrame frame = new JFrame("Graphical representation of Processes execution order");
-//            GanttChart chart = new GanttChart(schedule);
-//            frame.add(chart);
-//            frame.setSize(800, 200);
-//            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//            frame.setVisible(true);
-//        }
+        if (schedule != null) {
+            SchedulingGraph.createAndShowGUI(
+                    schedule,
+                    "Process Execution Schedule",
+                    averageWaitingTime,
+                    averageTurnaroundTime
+            );
+        }
     }
 }

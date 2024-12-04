@@ -8,14 +8,17 @@ public class Process {
     private int burstTime;
     private int priority;
     private String color;
+    private int pid; // Added Process ID
     private int completionTime;
 
-    public Process(String name, int arrivalTime, int burstTime, int priority, String color) {
+    // Updated Constructor to include PID
+    public Process(String name, int arrivalTime, int burstTime, int priority, String color, int pid) {
         this.name = name;
         this.arrivalTime = arrivalTime;
         this.burstTime = burstTime;
         this.priority = priority;
         this.color = color;
+        this.pid = pid;
     }
 
     public String getName() {
@@ -36,6 +39,10 @@ public class Process {
 
     public Color getColor() {
         return Color.decode(color);
+    }
+
+    public int getPid() {
+        return pid;
     }
 
     public int getCompletionTime() {
