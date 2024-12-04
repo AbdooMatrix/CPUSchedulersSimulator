@@ -28,7 +28,7 @@ public class SchedulingGraph extends JPanel {
         int xOffset = 80;
         int yOffset = 80;
         int barHeight = 30;
-        int barSpacing = 60;
+        int barSpacing = 30;
         int timeUnitWidth = 40;
 
         // Title
@@ -51,7 +51,7 @@ public class SchedulingGraph extends JPanel {
         // Draw Process Bars
         for (int i = 0; i < schedule.size(); i++) {
             ProcessExecution exec = schedule.get(i);
-            int barStartX = xOffset + exec.startTime * timeUnitWidth;
+            int barStartX = xOffset + (exec.startTime - 1) * timeUnitWidth;
             int yPosition = yOffset + i * barSpacing;
 
             // Rounded process bar

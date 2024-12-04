@@ -10,7 +10,7 @@ public class ProcessExecution {
     public int priority;
     public int startTime; // Added to track when execution starts
 
-    // Updated Constructor
+    // Constructor
     public ProcessExecution(String processName, int duration, Color color, int pid, int priority, int startTime) {
         this.processName = processName;
         this.duration = duration;
