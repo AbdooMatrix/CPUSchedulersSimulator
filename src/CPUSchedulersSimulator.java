@@ -1,4 +1,5 @@
 import algorithms.PriorityScheduler;
+import algorithms.ShortestJobFirstScheduler;
 import models.Process;
 import models.ProcessExecution;
 
@@ -65,8 +66,9 @@ public class CPUSchedulersSimulator {
                 break;
 
             case 2:
-                // Call SJF Scheduler and get execution order
-                // SJF scheduler code would go here
+                ShortestJobFirstScheduler scheduler = new ShortestJobFirstScheduler(processes, contextSwitchingTime);
+                // Call the schedule method to start scheduling
+                scheduler.schedule();
                 break;
 
             case 3:
