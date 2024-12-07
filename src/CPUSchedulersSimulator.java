@@ -1,5 +1,6 @@
 import algorithms.PriorityScheduler;
 import algorithms.ShortestJobFirstScheduler;
+import algorithms.ShortestRemainingTimeFirstScheduler;
 import models.Process;
 import models.ProcessExecution;
 
