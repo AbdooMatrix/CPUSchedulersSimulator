@@ -73,7 +73,7 @@ public class CPUSchedulersSimulator {
                 break;
 
             case 3:
-               ShortestRemainingTimeFirstScheduler srtfScheduler = new ShortestRemainingTimeFirstScheduler();
+                ShortestRemainingTimeFirstScheduler srtfScheduler = new ShortestRemainingTimeFirstScheduler();
                 List<Process>res= srtfScheduler.schedule(processes, contextSwitchingTime);
                 srtfScheduler.printResults(res);
                 break;
