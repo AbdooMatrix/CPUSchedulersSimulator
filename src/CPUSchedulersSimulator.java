@@ -72,8 +72,9 @@ public class CPUSchedulersSimulator {
                 break;
 
             case 3:
-                // Call SRTF Scheduler and get execution order
-                // SRTF scheduler code would go here
+               ShortestRemainingTimeFirstScheduler srtfScheduler = new ShortestRemainingTimeFirstScheduler();
+                List<Process>res= srtfScheduler.schedule(processes, contextSwitchingTime);
+                srtfScheduler.printResults(res);
                 break;
 
             case 4:
