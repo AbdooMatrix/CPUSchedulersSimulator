@@ -11,6 +11,8 @@ public class Process {
     private int pid; // Added Process ID
     private int completionTime;
 
+    private int originalBurstTime=0;
+
     // Updated Constructor to include PID
     public Process(String name, int arrivalTime, int burstTime, int priority, String color, int pid) {
         this.name = name;
@@ -60,4 +62,17 @@ public class Process {
     public int getTurnaroundTime(int completionTime) {
         return completionTime - arrivalTime;
     }
+
+
+    
+    public void setBurstTime(int burstTime) {
+        this.burstTime = burstTime;
+    }
+    public int getWaitingTime_srtf(int completionTime) {
+        return completionTime - arrivalTime - originalBurstTime;
+    }
+    public void setOriginalBurstTime(int originalBurstTime) {
+        this.originalBurstTime = originalBurstTime;
+    }
+    public int getoriginalBurstTime() {return this.originalBurstTime;}
 }
