@@ -81,12 +81,15 @@ public class CPUSchedulersSimulator {
 
             case 4:
                 // FCAI Scheduling (assumed Round Robin or other method)
-                System.out.print("Enter Round Robin Quantum for FCAI: ");
-                int quantum = scanner.nextInt();
+                for(Process p : processes){
+                    System.out.print("Enter Round Robin Quantum for  " + p.getName() + " : ");
+                    int quantum = scanner.nextInt();
+                    p.setUpdatedQuantum(quantum);
+                }
 
                 FCAIScheduler fcaiScheduler = new FCAIScheduler(processes) ;
-
-
+                fcaiScheduler.schedule();
+                fcaiScheduler.printTimeline();
                 break;
         }
 
