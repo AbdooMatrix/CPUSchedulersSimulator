@@ -21,7 +21,6 @@ public class FCAIScheduler {
         calculateV2();
     }
 
-
     void handleReadyQueue(int currentTime){
         // Add processes to ready queue that have arrived
         for (int i = 0; i < processList.size(); i++) {
