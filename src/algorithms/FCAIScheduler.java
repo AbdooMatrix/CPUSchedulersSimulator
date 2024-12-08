@@ -55,63 +55,63 @@ public class FCAIScheduler {
                     .thenComparingInt(Process::getArrivalTime));
 
             // Execute the process
-            if(readyQueue.isEmpty()){
+            while(readyQueue.isEmpty()){
                 currentTime++;
+                handleReadyQueue(currentTime);
             }
-            else if (!readyQueue.isEmpty()) {
-                Process currentProcess = readyQueue.getFirst() ;
-                readyQueue.removeFirst() ;
 
-                processName = currentProcess.getName();
+            Process currentProcess = readyQueue.getFirst() ;
+            readyQueue.removeFirst() ;
 
-                int quantum = currentProcess.getUpdatedQuantum();
-                int nonPreemptiveTime = (int) Math.ceil(quantum * 0.4); // First 40% non-preemptive
-                int executionTime = Math.min(nonPreemptiveTime, currentProcess.getBurstTime());
+            processName = currentProcess.getName();
 
-                // Non-preemptive execution
-                currentProcess.setBurstTime(currentProcess.getBurstTime() - executionTime);
-                currentTime += executionTime;
+            int quantum = currentProcess.getUpdatedQuantum();
+            int nonPreemptiveTime = (int) Math.ceil(quantum * 0.4); // First 40% non-preemptive
+            int executionTime = Math.min(nonPreemptiveTime, currentProcess.getBurstTime());
 
-                int remainingQuantum = quantum - executionTime;
+            // Non-preemptive execution
+            currentProcess.setBurstTime(currentProcess.getBurstTime() - executionTime);
+            currentTime += executionTime;
 
-                if (!readyQueue.isEmpty() && currentProcess.getBurstTime() > 0 && remainingQuantum > 0) {
-                    handleReadyQueue(currentTime);
-                    recalculateFcaiFactor();
+            int remainingQuantum = quantum - executionTime;
 
-                    // Preemptive execution for remaining quantum (if allowed)
-                    Process readyQueueFirst = readyQueue.getFirst() ; // first queue
+            if (!readyQueue.isEmpty() && currentProcess.getBurstTime() > 0 && remainingQuantum > 0) {
+                handleReadyQueue(currentTime);
+                recalculateFcaiFactor();
 
-                    if(readyQueueFirst.getFcaiFactor() < currentProcess.getFcaiFactor()){
-                        readyQueue.add(currentProcess);
-                        currentProcess.setBurstTime(readyQueueFirst.getBurstTime() - executionTime);
-                    }
-                    else{
-                        int currQuantum = currentProcess.getUpdatedQuantum() ;
-                        while(readyQueueFirst.getFcaiFactor() >= currentProcess.getFcaiFactor() &&
-                                currentProcess.getBurstTime() > 0 && currQuantum > 0){
-                            currentTime++ ;
-                            currQuantum-- ;
-                            currentProcess.setBurstTime(currentProcess.getBurstTime() - 1);
-                            handleReadyQueue(currentTime);
-                            recalculateFcaiFactor();
-                        }
-                    }
-                    currentTime += executionTime;
+                // Preemptive execution for remaining quantum (if allowed)
+                Process readyQueueFirst = readyQueue.getFirst() ; // first queue
 
-                    // Update quantum
-                    if (currentProcess.getBurstTime() > 0) {
-                        currentProcess.setUpdatedQuantum(remainingQuantum > 0 ? remainingQuantum : quantum + 2);
-                        readyQueue.add(currentProcess); // Re-add to queue
-                    }
+                if(readyQueueFirst.getFcaiFactor() < currentProcess.getFcaiFactor()){
+                    readyQueue.add(currentProcess);
+                    currentProcess.setBurstTime(readyQueueFirst.getBurstTime() - executionTime);
                 }
                 else{
-                    while(readyQueue.isEmpty() && currentProcess.getBurstTime() > 0 && remainingQuantum > 0){
-                        remainingQuantum-- ;
+                    int currQuantum = currentProcess.getUpdatedQuantum() ;
+                    while(readyQueueFirst.getFcaiFactor() >= currentProcess.getFcaiFactor() &&
+                            currentProcess.getBurstTime() > 0 && currQuantum > 0){
                         currentTime++ ;
+                        currQuantum-- ;
                         currentProcess.setBurstTime(currentProcess.getBurstTime() - 1);
                         handleReadyQueue(currentTime);
                         recalculateFcaiFactor();
                     }
+                }
+                currentTime += executionTime;
+
+                // Update quantum
+                if (currentProcess.getBurstTime() > 0) {
+                    currentProcess.setUpdatedQuantum(remainingQuantum > 0 ? remainingQuantum : quantum + 2);
+                    readyQueue.add(currentProcess); // Re-add to queue
+                }
+            }
+            else{
+                while(readyQueue.isEmpty() && currentProcess.getBurstTime() > 0 && remainingQuantum > 0){
+                    remainingQuantum-- ;
+                    currentTime++ ;
+                    currentProcess.setBurstTime(currentProcess.getBurstTime() - 1);
+                    handleReadyQueue(currentTime);
+                    recalculateFcaiFactor();
                 }
             }
             // Update timeline

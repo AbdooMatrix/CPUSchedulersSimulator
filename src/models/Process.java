@@ -112,7 +112,6 @@ public class Process {
     }
 
     public void calculateFcaiFactor(double v1, double v2) {
-
         // v1 and v2 are scaling factors for arrival time and burst time
         this.fcaiFactor = (10 - priority) + Math.ceil(arrivalTime / v1) + Math.ceil(burstTime / v2);
     }
