@@ -3,13 +3,14 @@ package algorithms;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+
 import models.Process;
 
 public class FCAIScheduler {
 
     private List<Process> processList; // List of all processes
     private List<String> timeline;    // Execution timeline for reporting
-    private List<Process> readyQueue ;
+    private List<Process> readyQueue;
     private double v1;                // Scaling factor for Arrival Time
     private double v2;                // Scaling factor for Remaining Burst Time
 
@@ -22,7 +23,7 @@ public class FCAIScheduler {
     }
 
 
-    void handleReadyQueue(int currentTime){
+    void handleReadyQueue(int currentTime) {
         // Add processes to ready queue that have arrived
         for (int i = 0; i < processList.size(); i++) {
             Process process = processList.get(i);
@@ -33,7 +34,7 @@ public class FCAIScheduler {
         }
     }
 
-    void recalculateFcaiFactor(){
+    void recalculateFcaiFactor() {
         // Recalculate FCAI Factors for ready processes
         for (Process process : readyQueue) {
             process.calculateFcaiFactor(v1, v2);
@@ -44,7 +45,7 @@ public class FCAIScheduler {
         int currentTime = 0;
         while (!processList.isEmpty() || !readyQueue.isEmpty()) {
             String processName = "";
-            int start = currentTime  ;
+            int start = currentTime;
 
             handleReadyQueue(currentTime); // add process to ready queue if exist
             recalculateFcaiFactor();
@@ -56,8 +57,8 @@ public class FCAIScheduler {
 
             // Execute the process
             if (!readyQueue.isEmpty()) {
-                Process currentProcess = readyQueue.getFirst() ;
-                readyQueue.removeFirst() ;
+                Process currentProcess = readyQueue.getFirst();
+                readyQueue.removeFirst();
 
                 processName = currentProcess.getName();
 
@@ -76,18 +77,17 @@ public class FCAIScheduler {
                     recalculateFcaiFactor();
 
                     // Preemptive execution for remaining quantum (if allowed)
-                    Process readyQueueFirst = readyQueue.getFirst() ; // first queue
+                    Process readyQueueFirst = readyQueue.getFirst(); // first queue
 
-                    if(readyQueueFirst.getFcaiFactor() < currentProcess.getFcaiFactor()){
+                    if (readyQueueFirst.getFcaiFactor() < currentProcess.getFcaiFactor()) {
                         readyQueue.add(currentProcess);
                         currentProcess.setBurstTime(readyQueueFirst.getBurstTime() - executionTime);
-                    }
-                    else{
-                        int currQuantum = currentProcess.getUpdatedQuantum() ;
-                        while(readyQueueFirst.getFcaiFactor() >= currentProcess.getFcaiFactor() &&
-                                currentProcess.getBurstTime() > 0 && currQuantum > 0){
-                            currentTime++ ;
-                            currQuantum-- ;
+                    } else {
+                        int currQuantum = currentProcess.getUpdatedQuantum();
+                        while (readyQueueFirst.getFcaiFactor() >= currentProcess.getFcaiFactor() &&
+                                currentProcess.getBurstTime() > 0 && currQuantum > 0) {
+                            currentTime++;
+                            currQuantum--;
                             currentProcess.setBurstTime(currentProcess.getBurstTime() - 1);
                             handleReadyQueue(currentTime);
                             recalculateFcaiFactor();
@@ -100,23 +100,21 @@ public class FCAIScheduler {
                         currentProcess.setUpdatedQuantum(remainingQuantum > 0 ? remainingQuantum : quantum + 2);
                         readyQueue.add(currentProcess); // Re-add to queue
                     }
-                }
-                else{
-                    while(readyQueue.isEmpty() && currentProcess.getBurstTime() > 0 && remainingQuantum > 0){
-                        remainingQuantum-- ;
-                        currentTime++ ;
+                } else {
+                    while (readyQueue.isEmpty() && currentProcess.getBurstTime() > 0 && remainingQuantum > 0) {
+                        remainingQuantum--;
+                        currentTime++;
                         currentProcess.setBurstTime(currentProcess.getBurstTime() - 1);
                         handleReadyQueue(currentTime);
                         recalculateFcaiFactor();
                     }
                 }
-            }
-            else {
+            } else {
                 // If no process is ready, increment time
                 currentTime++;
             }
             // Update timeline
-            timeline.add("Time " + start + " to " + currentTime + ": " + processName );
+            timeline.add("Time " + start + " to " + currentTime + ": " + processName);
 
         }
     }
