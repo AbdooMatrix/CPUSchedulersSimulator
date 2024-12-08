@@ -43,7 +43,10 @@ public class FCAIScheduler {
     public void schedule() {
         int currentTime = 0;
         while (!processList.isEmpty() || !readyQueue.isEmpty()) {
-            handleReadyQueue(currentTime);
+            String processName = "";
+            int start = currentTime  ;
+
+            handleReadyQueue(currentTime); // add process to ready queue if exist
             recalculateFcaiFactor();
 
             // Sort ready queue by FCAI Factor (primary) and arrival time (secondary)
@@ -56,6 +59,8 @@ public class FCAIScheduler {
                 Process currentProcess = readyQueue.getFirst() ;
                 readyQueue.removeFirst() ;
 
+                processName = currentProcess.getName();
+
                 int quantum = currentProcess.getUpdatedQuantum();
                 int nonPreemptiveTime = (int) Math.ceil(quantum * 0.4); // First 40% non-preemptive
                 int executionTime = Math.min(nonPreemptiveTime, currentProcess.getBurstTime());
@@ -63,9 +68,6 @@ public class FCAIScheduler {
                 // Non-preemptive execution
                 currentProcess.setBurstTime(currentProcess.getBurstTime() - executionTime);
                 currentTime += executionTime;
-
-                // Add execution details to timeline
-                // timeline.add("Time " + (currentTime - executionTime) + " to " + currentTime + ": " + currentProcess.getName());
 
                 int remainingQuantum = quantum - executionTime;
 
@@ -84,7 +86,6 @@ public class FCAIScheduler {
                         int currQuantum = currentProcess.getUpdatedQuantum() ;
                         while(readyQueueFirst.getFcaiFactor() >= currentProcess.getFcaiFactor() &&
                                 currentProcess.getBurstTime() > 0 && currQuantum > 0){
-
                             currentTime++ ;
                             currQuantum-- ;
                             currentProcess.setBurstTime(currentProcess.getBurstTime() - 1);
@@ -94,9 +95,6 @@ public class FCAIScheduler {
                     }
                     currentTime += executionTime;
 
-                    // Update timeline
-                    timeline.add("Time " + (currentTime - executionTime) + " to " + currentTime + ": " + currentProcess.getName());
-
                     // Update quantum
                     if (currentProcess.getBurstTime() > 0) {
                         currentProcess.setUpdatedQuantum(remainingQuantum > 0 ? remainingQuantum : quantum + 2);
@@ -104,24 +102,24 @@ public class FCAIScheduler {
                     }
                 }
                 else{
-                    int currQuantum = currentProcess.getUpdatedQuantum() ;
-                    while(readyQueue.isEmpty() &&currentProcess.getBurstTime() > 0 && currQuantum > 0){
+                    while(readyQueue.isEmpty() && currentProcess.getBurstTime() > 0 && remainingQuantum > 0){
+                        remainingQuantum-- ;
                         currentTime++ ;
-                        currQuantum-- ;
                         currentProcess.setBurstTime(currentProcess.getBurstTime() - 1);
                         handleReadyQueue(currentTime);
                         recalculateFcaiFactor();
                     }
                 }
-                readyQueue.remove(0); // Remove from front after execution
             }
             else {
                 // If no process is ready, increment time
                 currentTime++;
             }
+            // Update timeline
+            timeline.add("Time " + start + " to " + currentTime + ": " + processName );
+
         }
     }
-
 
     private void calculateV1() {
         double lastArriveTime = Double.MIN_VALUE;
