@@ -65,7 +65,7 @@ public class ShortestRemainingTimeFirstScheduler {
 
         // Print individual process results (waiting time, turnaround time)
         for (Process p : executionOrder) {
-            int waitTime = p.getWaitingTime(p.getCompletionTime());
+            int waitTime = p.getWaitingTimeSRTF(p.getCompletionTime());
             int turnaroundTime = p.getTurnaroundTime(p.getCompletionTime());
             System.out.println("Process: " + p.getName());
             System.out.println("Waiting Time: " + waitTime);
@@ -73,7 +73,7 @@ public class ShortestRemainingTimeFirstScheduler {
         }
 
         double avgWait = executionOrder.stream()
-                .mapToInt(p -> p.getWaitingTime(p.getCompletionTime()))
+                .mapToInt(p -> p.getWaitingTimeSRTF(p.getCompletionTime()))
                 .average()
                 .orElse(0);
 
