@@ -4,13 +4,13 @@ import java.awt.geom.RoundRectangle2D;
 import java.util.List;
 import models.ProcessExecution;
 
-public class SchedulingGraph extends JPanel {
+public class GanttChart extends JPanel {
     private final List<ProcessExecution> schedule;
     private final String scheduleName;
     private final double averageWaitingTime;
     private final double averageTurnaroundTime;
 
-    public SchedulingGraph(List<ProcessExecution> schedule, String scheduleName, double awt, double ata) {
+    public GanttChart(List<ProcessExecution> schedule, String scheduleName, double awt, double ata) {
         this.schedule = schedule;
         this.scheduleName = scheduleName;
         this.averageWaitingTime = awt;
@@ -91,26 +91,30 @@ public class SchedulingGraph extends JPanel {
         mainPanel.setBackground(Color.DARK_GRAY);
 
         // Create the grid panel
-        SchedulingGraph gridPanel = new SchedulingGraph(schedule, scheduleName, awt, ata);
+        GanttChart gridPanel = new GanttChart(schedule, scheduleName, awt, ata);
         JScrollPane scrollPane = new JScrollPane(gridPanel);
         scrollPane.setPreferredSize(new Dimension(1200, 800)); // Ensure scroll pane has a preferred size
 
         // Create the legend panel
         JPanel legendPanel = new JPanel();
         legendPanel.setBackground(Color.DARK_GRAY);
-        legendPanel.setLayout(new BoxLayout(legendPanel, BoxLayout.Y_AXIS));
+        legendPanel.setLayout(new BorderLayout());
         legendPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 0, 20)); // Add space above and after the legend panel
 
         JLabel titleLabel = new JLabel("Processes Information");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 20)); // Bigger and bolder font
         titleLabel.setForeground(Color.RED);
-        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT); // Center align the title label
-        legendPanel.add(titleLabel);
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER); // Center align the title label
+        legendPanel.add(titleLabel, BorderLayout.NORTH);
+
+        JPanel processListPanel = new JPanel();
+        processListPanel.setBackground(Color.DARK_GRAY);
+        processListPanel.setLayout(new BoxLayout(processListPanel, BoxLayout.Y_AXIS));
 
         for (ProcessExecution exec : schedule) {
             JPanel processInfoPanel = new JPanel();
             processInfoPanel.setBackground(Color.DARK_GRAY);
-            processInfoPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+            processInfoPanel.setLayout(new BoxLayout(processInfoPanel, BoxLayout.X_AXIS)); // Change to BoxLayout
 
             JLabel colorLabel = new JLabel();
             colorLabel.setOpaque(true);
@@ -122,10 +126,13 @@ public class SchedulingGraph extends JPanel {
             processLabel.setForeground(Color.WHITE);
 
             processInfoPanel.add(colorLabel);
+            processInfoPanel.add(Box.createRigidArea(new Dimension(10, 0))); // Add space between color and text
             processInfoPanel.add(processLabel);
 
-            legendPanel.add(processInfoPanel);
+            processListPanel.add(processInfoPanel);
         }
+
+        legendPanel.add(new JScrollPane(processListPanel), BorderLayout.CENTER);
 
         // Create the statistics panel
         JPanel statsPanel = new JPanel();

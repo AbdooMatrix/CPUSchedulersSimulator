@@ -5,7 +5,6 @@ import algorithms.ShortestRemainingTimeFirstScheduler;
 import models.Process;
 import models.ProcessExecution;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -52,6 +51,7 @@ public class CPUSchedulersSimulator {
         int contextSwitchingTime = scanner.nextInt();
 
         List<ProcessExecution> schedule = null;
+        String scheduleName = null;
         double averageWaitingTime = 0;
         double averageTurnaroundTime = 0;
 
@@ -59,6 +59,7 @@ public class CPUSchedulersSimulator {
             case 1:
                 // Use PriorityScheduler
                 PriorityScheduler priorityScheduler = new PriorityScheduler();
+                scheduleName = "Process Execution by Priority Scheduling";
                 schedule = priorityScheduler.schedule(processes, contextSwitchingTime);
                 averageWaitingTime = priorityScheduler.calculateAverageWaitingTime(processes);
                 averageTurnaroundTime = priorityScheduler.calculateAverageTurnaroundTime(processes);
@@ -68,15 +69,27 @@ public class CPUSchedulersSimulator {
                 break;
 
             case 2:
-                ShortestJobFirstScheduler scheduler = new ShortestJobFirstScheduler(processes, contextSwitchingTime);
-                // Call the schedule method to start scheduling
-                scheduler.schedule();
+                // Use ShortestJobFirstScheduler
+                ShortestJobFirstScheduler shortestJobFirstScheduler = new ShortestJobFirstScheduler();
+                scheduleName = "Process Execution by Shortest Job First Scheduling";
+                schedule = shortestJobFirstScheduler.schedule(processes, contextSwitchingTime);
+                averageWaitingTime = shortestJobFirstScheduler.calculateAverageWaitingTime(processes);
+                averageTurnaroundTime = shortestJobFirstScheduler.calculateAverageTurnaroundTime(processes);
+
+                // Print results (with execution order passed in)
+                shortestJobFirstScheduler.printResults(processes, schedule);
                 break;
 
             case 3:
-                ShortestRemainingTimeFirstScheduler srtfScheduler = new ShortestRemainingTimeFirstScheduler();
-                List<Process>res= srtfScheduler.schedule(processes, contextSwitchingTime);
-                srtfScheduler.printResults(res);
+                // Use ShortestJobFirstScheduler
+                ShortestRemainingTimeFirstScheduler shortestRemainingTimeFirstScheduler = new ShortestRemainingTimeFirstScheduler();
+                scheduleName = "Process Execution by Shortest Remaining Time First Scheduling";
+                schedule = shortestRemainingTimeFirstScheduler.schedule(processes, contextSwitchingTime);
+                averageWaitingTime = shortestRemainingTimeFirstScheduler.calculateAverageWaitingTime(processes);
+                averageTurnaroundTime = shortestRemainingTimeFirstScheduler.calculateAverageTurnaroundTime(processes);
+
+                // Print results (with execution order passed in)
+                shortestRemainingTimeFirstScheduler.printResults(processes, schedule);
                 break;
 
             case 4:
@@ -95,9 +108,9 @@ public class CPUSchedulersSimulator {
 
         // If there is a valid schedule, pass it to GUI creation
         if (schedule != null) {
-            SchedulingGraph.createAndShowGUI(
+            GanttChart.createAndShowGUI(
                     schedule,
-                    "Process Execution Schedule",
+                    scheduleName,
                     averageWaitingTime,
                     averageTurnaroundTime
             );
