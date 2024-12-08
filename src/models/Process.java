@@ -23,6 +23,16 @@ public class Process {
         this.pid = pid;
     }
 
+
+    public Process(String name, int arrivalTime, int burstTime, int priority, String color, int pid , double quantum) {
+        this.name = name;
+        this.arrivalTime = arrivalTime;
+        this.burstTime = burstTime;
+        this.priority = priority;
+        this.color = color;
+        this.pid = pid;
+    }
+
     public String getName() {
         return name;
     }
@@ -64,7 +74,7 @@ public class Process {
     }
 
 
-    
+
     public void setBurstTime(int burstTime) {
         this.burstTime = burstTime;
     }

@@ -1,3 +1,4 @@
+import algorithms.FCAIScheduler;
 import algorithms.PriorityScheduler;
 import algorithms.ShortestJobFirstScheduler;
 import algorithms.ShortestRemainingTimeFirstScheduler;
@@ -82,7 +83,10 @@ public class CPUSchedulersSimulator {
                 // FCAI Scheduling (assumed Round Robin or other method)
                 System.out.print("Enter Round Robin Quantum for FCAI: ");
                 int quantum = scanner.nextInt();
-                // FCAI scheduling code would go here
+
+                FCAIScheduler fcaiScheduler = new FCAIScheduler(processes) ;
+
+
                 break;
         }
 
