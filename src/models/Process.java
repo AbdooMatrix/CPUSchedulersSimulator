@@ -8,12 +8,13 @@ public class Process {
     private int burstTime;
     private int priority;
     private String color;
-    private int pid; // Added Process ID
+    private int pid;
     private int completionTime;
+    private int originalBurstTime = 0;
+    private double fcaiFactor; // For FCAI Scheduler
+    private int updatedQuantum;
 
-    private int originalBurstTime=0;
-
-    // Updated Constructor to include PID
+    // Constructor
     public Process(String name, int arrivalTime, int burstTime, int priority, String color, int pid) {
         this.name = name;
         this.arrivalTime = arrivalTime;
@@ -23,16 +24,7 @@ public class Process {
         this.pid = pid;
     }
 
-
-    public Process(String name, int arrivalTime, int burstTime, int priority, String color, int pid , double quantum) {
-        this.name = name;
-        this.arrivalTime = arrivalTime;
-        this.burstTime = burstTime;
-        this.priority = priority;
-        this.color = color;
-        this.pid = pid;
-    }
-
+    // Getters and Setters
     public String getName() {
         return name;
     }
@@ -43,6 +35,10 @@ public class Process {
 
     public int getBurstTime() {
         return burstTime;
+    }
+
+    public void setBurstTime(int burstTime) {
+        this.burstTime = burstTime;
     }
 
     public int getPriority() {
@@ -65,6 +61,14 @@ public class Process {
         this.completionTime = completionTime;
     }
 
+    public int getOriginalBurstTime() {
+        return originalBurstTime;
+    }
+
+    public void setOriginalBurstTime(int originalBurstTime) {
+        this.originalBurstTime = originalBurstTime;
+    }
+
     public int getWaitingTime(int completionTime) {
         return completionTime - arrivalTime - burstTime;
     }
@@ -73,16 +77,45 @@ public class Process {
         return completionTime - arrivalTime;
     }
 
-
-
-    public void setBurstTime(int burstTime) {
-        this.burstTime = burstTime;
-    }
-    public int getWaitingTime_srtf(int completionTime) {
+    public int getWaitingTimeSRTF(int completionTime) {
         return completionTime - arrivalTime - originalBurstTime;
     }
-    public void setOriginalBurstTime(int originalBurstTime) {
-        this.originalBurstTime = originalBurstTime;
+
+    // FCAI-specific methods
+    public double getFcaiFactor() {
+        return fcaiFactor;
     }
-    public int getoriginalBurstTime() {return this.originalBurstTime;}
+
+    public void setFcaiFactor(double fcaiFactor) {
+        this.fcaiFactor = fcaiFactor;
+    }
+
+    public int getUpdatedQuantum() {
+        return updatedQuantum;
+    }
+
+    public void setUpdatedQuantum(int updatedQuantum) {
+        this.updatedQuantum = updatedQuantum;
+    }
+
+    public void calculateFcaiFactor(double v1, double v2) {
+        this.fcaiFactor = (10 - priority) + (arrivalTime / v1) + (burstTime / v2);
+    }
+
+    // Override toString() for debugging
+    @Override
+    public String toString() {
+        return "Process{" +
+                "name='" + name + '\'' +
+                ", arrivalTime=" + arrivalTime +
+                ", burstTime=" + burstTime +
+                ", priority=" + priority +
+                ", color='" + color + '\'' +
+                ", pid=" + pid +
+                ", completionTime=" + completionTime +
+                ", originalBurstTime=" + originalBurstTime +
+                ", fcaiFactor=" + fcaiFactor +
+                ", updatedQuantum=" + updatedQuantum +
+                '}';
+    }
 }

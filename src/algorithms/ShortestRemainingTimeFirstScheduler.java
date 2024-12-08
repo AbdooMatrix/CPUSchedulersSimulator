@@ -22,7 +22,7 @@ public class ShortestRemainingTimeFirstScheduler {
         while (completed < processes.size()) {
             for (Process process : processes) {
                 if (!queue.contains(process) && process.getArrivalTime() <= currentTime && process.getBurstTime() > 0) {
-                    if (process.getoriginalBurstTime() == 0) {
+                    if (process.getOriginalBurstTime() == 0) {
                         process.setOriginalBurstTime(process.getBurstTime());
                     }
                     queue.add(process);
@@ -65,7 +65,7 @@ public class ShortestRemainingTimeFirstScheduler {
 
         // Print individual process results (waiting time, turnaround time)
         for (Process p : executionOrder) {
-            int waitTime = p.getWaitingTime_srtf(p.getCompletionTime());
+            int waitTime = p.getWaitingTime(p.getCompletionTime());
             int turnaroundTime = p.getTurnaroundTime(p.getCompletionTime());
             System.out.println("Process: " + p.getName());
             System.out.println("Waiting Time: " + waitTime);
@@ -73,7 +73,7 @@ public class ShortestRemainingTimeFirstScheduler {
         }
 
         double avgWait = executionOrder.stream()
-                .mapToInt(p -> p.getWaitingTime_srtf(p.getCompletionTime()))
+                .mapToInt(p -> p.getWaitingTime(p.getCompletionTime()))
                 .average()
                 .orElse(0);
 
