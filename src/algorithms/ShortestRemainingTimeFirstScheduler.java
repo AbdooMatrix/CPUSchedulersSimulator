@@ -77,14 +77,6 @@ public class ShortestRemainingTimeFirstScheduler {
                 currentProcess.setCompletionTime(currentTime);
                 completed++;
                 executionOrder2.add(currentProcess);
-//                executionOrder.add(new ProcessExecution(
-//                        currentProcess.getName(),
-//                        1, // Each unit of execution is 1
-//                        currentProcess.getColor(),
-//                        currentProcess.getPid(),
-//                        currentProcess.getPriority(),
-//                        currentTime
-//                ));
 
             } else {
                 queue.add(currentProcess);

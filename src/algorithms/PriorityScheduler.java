@@ -15,14 +15,8 @@ public class PriorityScheduler {
                 return priorityCompare;
             }
 
-            // If priority is the same, compare arrival time
-            int arrivalCompare = Integer.compare(p1.getArrivalTime(), p2.getArrivalTime());
-            if (arrivalCompare != 0) {
-                return arrivalCompare;
-            }
-
-            // If both priority and arrival time are the same, compare burst time (shortest first)
-            return Integer.compare(p1.getBurstTime(), p2.getBurstTime());
+            // If both priority is the same, compare arrival time
+            return Integer.compare(p1.getArrivalTime(), p2.getArrivalTime());
         });
 
         List<ProcessExecution> executionOrder = new ArrayList<>();
@@ -60,7 +54,7 @@ public class PriorityScheduler {
 
         // Print execution order
         for (ProcessExecution pe : executionOrder) {
-            System.out.println(pe.getProcessName());
+            System.out.println(pe.getProcessName() + " -> " + pe.getProcessName());
         }
 
         // Print individual process results (waiting time, turnaround time)

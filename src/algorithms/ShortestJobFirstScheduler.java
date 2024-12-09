@@ -65,8 +65,7 @@ public class ShortestJobFirstScheduler {
                 // Select the process with the shortest burst time
                 selectedProcess = availableProcesses.stream()
                         .min(Comparator.comparingInt(Process::getBurstTime)
-                                .thenComparingInt(Process::getArrivalTime)
-                                .thenComparingInt(Process::getPriority))
+                                .thenComparingInt(Process::getArrivalTime))
                         .orElseThrow(() -> new NoSuchElementException("No process found in availableProcesses"));
             }
 

@@ -111,13 +111,18 @@ public class FCAIScheduler {
 
             if (currentProcess.getBurstTime() == 0) {
                 currentProcess.setCompletionTime(currentTime);
+                timeline.add("Process " + currentProcess.getName() + ": from " + start + " to " + currentTime + " --> completed");
                 choice = 2;
             } else if (remainingQuantum == 0) {
                 currentProcess.setUpdatedQuantum(quantum + 2);
+                timeline.add("Process " + currentProcess.getName() + ": from " + start + " to " + currentTime +
+                        ", Quantum: " + quantum + " --> " + currentProcess.getUpdatedQuantum());
                 readyQueue.add(currentProcess);
                 choice = 2;
             } else {
                 currentProcess.setUpdatedQuantum(quantum + remainingQuantum);
+                timeline.add("Process " + currentProcess.getName() + ": from " + start + " to " + currentTime +
+                        ", Quantum: " + quantum + " --> " + currentProcess.getUpdatedQuantum());
                 readyQueue.add(currentProcess);
                 choice = 1;
             }
