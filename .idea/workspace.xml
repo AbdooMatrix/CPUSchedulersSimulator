@@ -7,8 +7,10 @@
     <list default="true" id="bb1c55d4-15b5-437e-8f9e-b0cc1a0cc28f" name="Changes" comment="edit">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CPUSchedulersSimulator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CPUSchedulersSimulator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GanttChart.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/GanttChart.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/algorithms/FCAIScheduler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/algorithms/FCAIScheduler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/algorithms/PriorityScheduler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/algorithms/PriorityScheduler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/algorithms/ShortestJobFirstScheduler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/algorithms/ShortestJobFirstScheduler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/Process.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/Process.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/ProcessExecution.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/ProcessExecution.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,28 +53,28 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.CPUSchedulersSimulator.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "D:/College/Projects/LearningManagementSystem",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.CPUSchedulersSimulator.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/College/Projects/LearningManagementSystem&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -111,7 +113,8 @@
       <workItem from="1733739119149" duration="6501000" />
       <workItem from="1733746650702" duration="3445000" />
       <workItem from="1733752810418" duration="5767000" />
-      <workItem from="1733758624869" duration="8132000" />
+      <workItem from="1733758624869" duration="9082000" />
+      <workItem from="1733771410601" duration="5656000" />
     </task>
     <task id="LOCAL-00001" summary="edit">
       <option name="closed" value="true" />
@@ -257,7 +260,23 @@
       <option name="project" value="LOCAL" />
       <updated>1733742738790</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="Major edits">
+      <option name="closed" value="true" />
+      <created>1733766991417</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1733766991417</updated>
+    </task>
+    <task id="LOCAL-00020" summary="edit">
+      <option name="closed" value="true" />
+      <created>1733776560548</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1733776560548</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -279,6 +298,7 @@
     <MESSAGE value="adjusted the processes graph" />
     <MESSAGE value="made some edits on the PriorityScheduler" />
     <MESSAGE value="GUI edit for the shortest schedulers" />
+    <MESSAGE value="Major edits" />
     <MESSAGE value="edit" />
     <option name="LAST_COMMIT_MESSAGE" value="edit" />
   </component>

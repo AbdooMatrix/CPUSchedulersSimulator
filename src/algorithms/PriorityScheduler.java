@@ -6,59 +6,65 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PriorityScheduler {
+
+    // Schedules processes using a non-preemptive priority scheduling algorithm.
     public List<ProcessExecution> schedule(List<Process> processes, int contextSwitchingTime) {
-        // Sort by priority first, then by arrival time if priorities are equal
+        // Sort processes based on priority first, and arrival time if priorities are equal
         processes.sort((p1, p2) -> {
-            // First, compare priority
+            // Compare by priority
             int priorityCompare = Integer.compare(p1.getPriority(), p2.getPriority());
             if (priorityCompare != 0) {
-                return priorityCompare;
+                return priorityCompare; // Lower priority value comes first
             }
-
-            // If both priority is the same, compare arrival time
+            // If priorities are equal, compare by arrival time
             return Integer.compare(p1.getArrivalTime(), p2.getArrivalTime());
         });
 
+        // List to store the execution order of processes
         List<ProcessExecution> executionOrder = new ArrayList<>();
+
+        // Tracks the current time in the scheduler
         int currentTime = 0;
 
+        // Iterate over each process and schedule it
         for (Process process : processes) {
-            // Wait for the process to arrive if necessary
+            // If the process has not yet arrived, wait until it does
             if (process.getArrivalTime() > currentTime) {
                 currentTime = process.getArrivalTime();
             }
 
-            // Add execution entry with correct start time and duration
+            // Add the process execution to the schedule
             executionOrder.add(new ProcessExecution(
-                    process.getName(),
-                    process.getBurstTime(),
-                    process.getColor(),
-                    process.getPid(),
-                    process.getPriority(),
-                    currentTime // Add startTime here
+                    process.getName(),        // Process name
+                    process.getBurstTime(),   // Execution duration (burst time)
+                    process.getColor(),       // Display color for visualization
+                    process.getPid(),         // Unique process ID
+                    process.getPriority(),    // Process priority
+                    currentTime               // Start time of execution
             ));
 
-            // Update process completion time
+            // Update the process completion time
             currentTime += process.getBurstTime();
             process.setCompletionTime(currentTime);
 
-            // Add context switching time (simulated after each process completes)
+            // Add context switching time after the process finishes
             currentTime += contextSwitchingTime;
         }
 
         return executionOrder;
     }
 
+    // Prints the results of the scheduling algorithm.
     public void printResults(List<Process> processes, List<ProcessExecution> executionOrder) {
+        // Display the order of execution
         System.out.println("Process Execution Order:");
-
-        // Print execution order
         for (ProcessExecution pe : executionOrder) {
             System.out.println(pe.getProcessName() + " -> " + pe.getProcessName());
         }
 
-        // Print individual process results (waiting time, turnaround time)
+        // Display individual process metrics
         for (Process p : processes) {
+            // Calculate and display waiting time and turnaround time for each process
             int waitTime = p.getWaitingTime(p.getCompletionTime());
             int turnaroundTime = p.getTurnaroundTime(p.getCompletionTime());
             System.out.println("Process: " + p.getName());
@@ -66,6 +72,7 @@ public class PriorityScheduler {
             System.out.println("Turnaround Time: " + turnaroundTime + '\n');
         }
 
+        // Calculate and display average waiting time and turnaround time
         double avgWait = calculateAverageWaitingTime(processes);
         double avgTurnaround = calculateAverageTurnaroundTime(processes);
 
@@ -73,20 +80,29 @@ public class PriorityScheduler {
         System.out.println("Average Turnaround Time: " + avgTurnaround);
     }
 
+    // Calculates the average waiting time for all processes.
     public double calculateAverageWaitingTime(List<Process> processes) {
         int totalWaitingTime = 0;
+
+        // Sum up waiting times for all processes
         for (Process p : processes) {
             totalWaitingTime += p.getWaitingTime(p.getCompletionTime());
         }
-        double averageWaitingTime = (double) totalWaitingTime / processes.size();
-        return averageWaitingTime;
+
+        // Calculate and return the average
+        return (double) totalWaitingTime / processes.size();
     }
 
+    // Calculates the average turnaround time for all processes.
     public double calculateAverageTurnaroundTime(List<Process> processes) {
         int totalTurnaroundTime = 0;
+
+        // Sum up turnaround times for all processes
         for (Process p : processes) {
             totalTurnaroundTime += p.getTurnaroundTime(p.getCompletionTime());
         }
+
+        // Calculate and return the average
         return (double) totalTurnaroundTime / processes.size();
     }
 }
