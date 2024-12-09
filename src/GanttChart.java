@@ -55,7 +55,7 @@ public class GanttChart extends JPanel {
         // Draw Process Bars and Labels
         for (int i = 0; i < schedule.size(); i++) {
             ProcessExecution exec = schedule.get(i);
-            int barStartX = xOffset + (exec.startTime - 1) * timeUnitWidth;
+            int barStartX = xOffset + exec.startTime * timeUnitWidth;
             int yPosition = yOffset + i * barSpacing;
 
             // Rounded process bar
