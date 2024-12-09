@@ -28,6 +28,7 @@ public class ShortestJobFirstScheduler {
         int totalTurnaroundTime = 0;
         List<Process> executionOrder = new ArrayList<>();
         List<ProcessExecution> executionOrder2 = new ArrayList<>();
+          boolean isFirstProcess = true; // Add a flag to track the first process
 
         while (!processList.isEmpty()) {
             // Filter processes that have arrived by the current time
@@ -79,13 +80,15 @@ public class ShortestJobFirstScheduler {
             ));
 
             // Simulate process execution and context switching
-            int startExecutionTime = (executionOrder.size() > 1) ? currentTime + contextSwitchTime : currentTime;
+            int startExecutionTime = isFirstProcess ? currentTime : currentTime + contextSwitchTime;
             int completionTime = startExecutionTime + selectedProcess.getBurstTime();
 
             selectedProcess.setCompletionTime(completionTime);
 
             // Update current time
             currentTime = completionTime;
+             // Update the flag to indicate that the first process has been executed
+            isFirstProcess = false;
 
             // Calculate waiting and turnaround times
             int waitingTime = selectedProcess.getWaitingTime(completionTime);
