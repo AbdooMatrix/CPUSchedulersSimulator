@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import models.Process;
+import models.ProcessExecution;
 
 public class FCAIScheduler {
 
@@ -89,12 +90,14 @@ public class FCAIScheduler {
             }
 
             if (currentProcess.getBurstTime() == 0) {
-                timeline.add("Time " + start + " to " + currentTime + ": " + currentProcess.getName());
+                currentProcess.setCompletionTime(currentTime);
+                timeline.add("Time " + start + " to " + currentTime + ": " + currentProcess.getName() + " --> completed");
                 currentProcess = null;
             }
             else if (remainingQuantum == 0) {
                 currentProcess.setUpdatedQuantum(quantum + 2);
-                timeline.add("Time " + start + " to " + currentTime + ": " + currentProcess.getName());
+                timeline.add("Time " + start + " to " + currentTime + ": " + currentProcess.getName()
+                        + " , quantum :  " + quantum + " --> " + currentProcess.getUpdatedQuantum());
                 readyQueue.add(currentProcess);
                 currentProcess = null ;
             }
@@ -115,18 +118,21 @@ public class FCAIScheduler {
                 }
 
                 if (currentProcess.getBurstTime() == 0) {
-                    timeline.add("Time " + start + " to " + currentTime + ": " + currentProcess.getName());
+                    currentProcess.setCompletionTime(currentTime);
+                    timeline.add("Time " + start + " to " + currentTime + ": " + currentProcess.getName() + " --> completed");
                     currentProcess = null;
                 } else if (remainingQuantum == 0) {
-                    timeline.add("Time " + start + " to " + currentTime + ": " + currentProcess.getName());
                     currentProcess.setUpdatedQuantum(quantum + 2);
+                    timeline.add("Time " + start + " to " + currentTime + ": " + currentProcess.getName()
+                            + " , quantum :  " + quantum + " --> " + currentProcess.getUpdatedQuantum());
                     readyQueue.add(currentProcess);
                     currentProcess = null ;
                 }
                 else // process has preempted the current process
                 {
-                    timeline.add("Time " + start + " to " + currentTime + ": " + currentProcess.getName());
                     currentProcess.setUpdatedQuantum(quantum + remainingQuantum);
+                    timeline.add("Time " + start + " to " + currentTime + ": " + currentProcess.getName()
+                            + " , quantum :  " + quantum + " --> " + currentProcess.getUpdatedQuantum());
                     readyQueue.add(currentProcess);
                     currentProcess = null ;
                 }
@@ -151,7 +157,41 @@ public class FCAIScheduler {
         v2 = maxBurstTime / 10.0;
     }
 
-    public void printTimeline() {
+
+    public void printResults(List<Process> processes) {
+
         timeline.forEach(System.out::println);
+
+        // Print individual process results (waiting time, turnaround time)
+        for(Process p : processes){
+            System.out.println("prcocess " + p.getName()
+                    + " : turnaroundTime = " + p.getTurnaroundTime(p.getCompletionTime())
+                    + " , waitingTime = " + p.getWaitingTimeFcai(p.getBurstTime())) ;
+        }
+
+        double avgWait = calculateAverageWaitingTime(processes);
+        double avgTurnaround = calculateAverageTurnaroundTime(processes);
+
+        System.out.println("Average Waiting Time: " + avgWait);
+        System.out.println("Average Turnaround Time: " + avgTurnaround);
     }
+
+    public double calculateAverageWaitingTime(List<Process> processes) {
+        int totalWaitingTime = 0;
+        for (Process p : processes) {
+            totalWaitingTime += p.getWaitingTimeFcai(p.getOriginalBurstTime());
+        }
+        double averageWaitingTime = (double) totalWaitingTime / processes.size();
+        return averageWaitingTime;
+    }
+
+    public double calculateAverageTurnaroundTime(List<Process> processes) {
+        int totalTurnaroundTime = 0;
+        for (Process p : processes) {
+            totalTurnaroundTime += p.getTurnaroundTime(p.getCompletionTime());
+        }
+        return (double) totalTurnaroundTime / processes.size();
+    }
+
+
 }

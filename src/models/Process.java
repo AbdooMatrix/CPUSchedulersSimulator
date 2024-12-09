@@ -26,6 +26,7 @@ public class Process {
         this.priority = priority;
         this.color = color;
         this.pid = pid;
+        this.originalBurstTime = burstTime;
     }
 
     // Getters and Setters for Common Attributes
@@ -114,6 +115,10 @@ public class Process {
     public void calculateFcaiFactor(double v1, double v2) {
         // v1 and v2 are scaling factors for arrival time and burst time
         this.fcaiFactor = (10 - priority) + Math.ceil(arrivalTime / v1) + Math.ceil(burstTime / v2);
+    }
+
+    public int getWaitingTimeFcai(int bursTime){
+        return getTurnaroundTime(this.completionTime) - originalBurstTime ;
     }
 
     // Debugging and Visualization

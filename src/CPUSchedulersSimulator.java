@@ -97,7 +97,7 @@ public class CPUSchedulersSimulator {
 
                 FCAIScheduler fcaiScheduler = new FCAIScheduler(processes) ;
                 fcaiScheduler.schedule();
-                fcaiScheduler.printTimeline();
+                fcaiScheduler.printResults(processes);
                 break;
         }
 
