@@ -6,82 +6,114 @@ import models.ProcessExecution;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class ShortestJobFirstScheduler {
 
-    public List<ProcessExecution> schedule(List<Process> processes, int contextSwitchingTime) {
-        // Sort processes by arrival time, then burst time, then priority
-        processes.sort(Comparator.comparingInt(Process::getArrivalTime)
-                .thenComparingInt(Process::getBurstTime)
-                .thenComparingInt(Process::getPriority));
+    private List<Process> processList;
+    private int contextSwitchTime;
+    private static final int MAX_WAIT_TIME = 20; // Define maximum wait time to avoid starvation
 
-        List<ProcessExecution> executionOrder = new ArrayList<>();
+    public ShortestJobFirstScheduler(List<Process> processList, int contextSwitchTime) {
+        this.processList = processList;
+        this.contextSwitchTime = contextSwitchTime;
+    }
+
+    public List<ProcessExecution> schedule() {
+        // Sort processes by arrival time first, then burst time
+        processList.sort(Comparator.comparingInt(Process::getArrivalTime).thenComparingInt(Process::getBurstTime).thenComparing(Process::getPriority));
+
         int currentTime = 0;
+        int totalWaitingTime = 0;
+        int totalTurnaroundTime = 0;
+        List<Process> executionOrder = new ArrayList<>();
+        List<ProcessExecution> executionOrder2 = new ArrayList<>();
 
-        for (Process process : processes) {
-            // Wait for the process to arrive if necessary
-            if (process.getArrivalTime() > currentTime) {
-                currentTime = process.getArrivalTime();
+        while (!processList.isEmpty()) {
+            // Filter processes that have arrived by the current time
+            List<Process> availableProcesses = new ArrayList<>();
+            for (Process p : processList) {
+                if (p.getArrivalTime() <= currentTime) {
+                    availableProcesses.add(p);
+                }
             }
 
-            // Add execution entry with correct start time and duration
-            executionOrder.add(new ProcessExecution(
-                    process.getName(),
-                    process.getBurstTime(),
-                    process.getColor(),
-                    process.getPid(),
-                    process.getPriority(),
+            if (availableProcesses.isEmpty()) {
+                currentTime++;
+                continue;
+            }
+
+            // Check for starvation in the available processes
+            Process starvedProcess = null;
+            for (Process process : availableProcesses) {
+                if (process.getWaitingTime(currentTime) > MAX_WAIT_TIME && process.getBurstTime() > 0) {
+                    starvedProcess = process;
+                    break;
+                }
+            }
+
+            Process selectedProcess;
+            if (starvedProcess != null) {
+                // Handle starvation: prioritize the starved process
+                System.out.println("Process " + starvedProcess.getName() + " starved! Executing immediately.");
+                selectedProcess = starvedProcess;
+            }
+            else {
+                // Select the process with the shortest burst time
+                selectedProcess = availableProcesses.stream()
+                        .min(Comparator.comparingInt(Process::getBurstTime)
+                                .thenComparingInt(Process::getArrivalTime)
+                                .thenComparingInt(Process::getPriority))
+                        .orElseThrow(() -> new NoSuchElementException("No process found in availableProcesses"));
+            }
+
+            processList.remove(selectedProcess);
+            executionOrder.add(selectedProcess);
+            executionOrder2.add(new ProcessExecution(
+                    selectedProcess.getName(),
+                    selectedProcess.getBurstTime(),
+                    selectedProcess.getColor(),
+                    selectedProcess.getPid(),
+                    selectedProcess.getPriority(),
                     currentTime // Add startTime here
             ));
 
-            // Update process completion time
-            currentTime += process.getBurstTime();
-            process.setCompletionTime(currentTime);
+            // Simulate process execution and context switching
+            int startExecutionTime = (executionOrder.size() > 1) ? currentTime + contextSwitchTime : currentTime;
+            int completionTime = startExecutionTime + selectedProcess.getBurstTime();
 
-            // Add context switching time (simulated after each process completes)
-            currentTime += contextSwitchingTime;
+            selectedProcess.setCompletionTime(completionTime);
+
+            // Update current time
+            currentTime = completionTime;
+
+            // Calculate waiting and turnaround times
+            int waitingTime = selectedProcess.getWaitingTime(completionTime);
+            int turnaroundTime = selectedProcess.getTurnaroundTime(completionTime);
+
+            totalWaitingTime += waitingTime;
+            totalTurnaroundTime += turnaroundTime;
+
+            // Print process execution
+            System.out.println("Executed Process: " + selectedProcess.getName());
+            System.out.println("Waiting Time: " + waitingTime);
+            System.out.println("Turnaround Time: " + turnaroundTime);
+            System.out.println("---------------------------");
         }
 
-        return executionOrder;
-    }
+        // Print average waiting and turnaround times
+        int numProcesses = executionOrder.size();
+        double avgWaitingTime = (double) totalWaitingTime / numProcesses;
+        double avgTurnaroundTime = (double) totalTurnaroundTime / numProcesses;
 
-    public void printResults(List<Process> processes, List<ProcessExecution> executionOrder) {
-        System.out.println("Process Execution Order:");
+        System.out.println("Average Waiting Time: " + avgWaitingTime);
+        System.out.println("Average Turnaround Time: " + avgTurnaroundTime);
 
         // Print execution order
-        for (ProcessExecution pe : executionOrder) {
-            System.out.println(pe.getProcessName());
-        }
+        System.out.println("Execution Order: ");
+        executionOrder.forEach(p -> System.out.print(p.getName() + " -> "));
+        System.out.println("End");
+        return executionOrder2;
 
-        // Print individual process results (waiting time, turnaround time)
-        for (Process p : processes) {
-            int waitTime = p.getWaitingTime(p.getCompletionTime());
-            int turnaroundTime = p.getTurnaroundTime(p.getCompletionTime());
-            System.out.println("Process: " + p.getName());
-            System.out.println("Waiting Time: " + waitTime);
-            System.out.println("Turnaround Time: " + turnaroundTime + '\n');
-        }
-
-        double avgWait = calculateAverageWaitingTime(processes);
-        double avgTurnaround = calculateAverageTurnaroundTime(processes);
-
-        System.out.println("Average Waiting Time: " + avgWait);
-        System.out.println("Average Turnaround Time: " + avgTurnaround);
-    }
-
-    public double calculateAverageWaitingTime(List<Process> processes) {
-        int totalWaitingTime = 0;
-        for (Process p : processes) {
-            totalWaitingTime += p.getWaitingTime(p.getCompletionTime());
-        }
-        return (double) totalWaitingTime / processes.size();
-    }
-
-    public double calculateAverageTurnaroundTime(List<Process> processes) {
-        int totalTurnaroundTime = 0;
-        for (Process p : processes) {
-            totalTurnaroundTime += p.getTurnaroundTime(p.getCompletionTime());
-        }
-        return (double) totalTurnaroundTime / processes.size();
     }
 }
