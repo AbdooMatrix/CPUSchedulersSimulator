@@ -1,10 +1,10 @@
 package algorithms;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
 import models.Process;
 import models.ProcessExecution;
 
@@ -12,7 +12,7 @@ public class FCAIScheduler {
 
     private List<Process> processList; // List of all processes
     private List<String> timeline;    // Execution timeline for reporting
-    private LinkedList<Process> readyQueue; // Changed to LinkedList for efficient manipulation
+    private LinkedList<Process> readyQueue; // Ready queue for processes
     private double v1;                // Scaling factor for Arrival Time
     private double v2;                // Scaling factor for Remaining Burst Time
 
@@ -28,15 +28,12 @@ public class FCAIScheduler {
         Iterator<Process> iterator = processList.iterator();
         while (iterator.hasNext()) {
             Process process = iterator.next();
-            if (process.getArrivalTime() <= currentTime) {
-                if (!readyQueue.contains(process)) { // Avoid duplicates
-                    readyQueue.add(process);
-                }
-                iterator.remove(); // Remove process from processList once added to readyQueue
+            if (process.getArrivalTime() <= currentTime && !readyQueue.contains(process)) {
+                readyQueue.add(process);
+                iterator.remove(); // Remove from processList once added to readyQueue
             }
         }
         calculateFcaiFactor();
-        sortReadyQueue();
     }
 
     private void calculateFcaiFactor() {
@@ -45,100 +42,89 @@ public class FCAIScheduler {
         }
     }
 
-    private void sortReadyQueue() {
-        readyQueue.sort(Comparator
-                .comparingDouble(Process::getFcaiFactor)
-                .thenComparingInt(Process::getArrivalTime));
+    private Process getBestProcessFromQueue() {
+        Process bestProcess = null;
+        for (Process process : readyQueue) {
+            if (bestProcess == null ||
+                    process.getFcaiFactor() < bestProcess.getFcaiFactor() ||
+                    (process.getFcaiFactor() == bestProcess.getFcaiFactor() &&
+                            process.getArrivalTime() < bestProcess.getArrivalTime())) {
+                bestProcess = process;
+            }
+        }
+        return bestProcess;
     }
 
-    public void schedule() {
+    public List<ProcessExecution> schedule(int contextSwitchingTime) {
         int currentTime = 0;
+        int choice = 2;
         Process currentProcess = null;
+        List<ProcessExecution> executionOrder = new ArrayList<>();
 
         while (!processList.isEmpty() || !readyQueue.isEmpty()) {
             updateReadyQueueState(currentTime);
 
-            // Handle idle time
-            while (readyQueue.isEmpty()) {
+            while (readyQueue.isEmpty() && !processList.isEmpty()) {
                 currentTime++;
                 updateReadyQueueState(currentTime);
             }
 
+            if (readyQueue.isEmpty()) break;
+
             int start = currentTime;
 
-            calculateFcaiFactor();
-            sortReadyQueue();
-
-            if (currentProcess == null) {
-                currentProcess = readyQueue.poll(); // Poll removes and retrieves the first element
+            if (choice == 1) {
+                currentProcess = getBestProcessFromQueue();
+                readyQueue.remove(currentProcess);
+            } else {
+                currentProcess = readyQueue.poll();
             }
 
             int quantum = currentProcess.getUpdatedQuantum();
             int nonPreemptiveTime = (int) Math.ceil(quantum * 0.4);
             int executionTime = Math.min(nonPreemptiveTime, currentProcess.getBurstTime());
 
-            // Non-preemptive execution
+            // Execute the process non-preemptively
             currentTime += executionTime;
             currentProcess.setBurstTime(currentProcess.getBurstTime() - executionTime);
             int remainingQuantum = quantum - executionTime;
 
-            while (currentProcess.getBurstTime() > 0 && readyQueue.isEmpty() && remainingQuantum > 0) {
+            while (currentProcess.getBurstTime() > 0 && remainingQuantum > 0) {
+                if (getBestProcessFromQueue() != null && getBestProcessFromQueue().getFcaiFactor() < currentProcess.getFcaiFactor()) {
+                    break;
+                }
                 currentTime++;
                 remainingQuantum--;
                 currentProcess.setBurstTime(currentProcess.getBurstTime() - 1);
                 updateReadyQueueState(currentTime);
             }
 
+            // Track execution
+            executionOrder.add(new ProcessExecution(
+                    currentProcess.getName(),
+                    currentTime - start,
+                    currentProcess.getColor(),
+                    currentProcess.getPid(),
+                    currentProcess.getPriority(),
+                    start
+            ));
+
             if (currentProcess.getBurstTime() == 0) {
                 currentProcess.setCompletionTime(currentTime);
-                timeline.add("Time " + start + " to " + currentTime + ": " + currentProcess.getName() + " --> completed");
-                currentProcess = null;
-            }
-            else if (remainingQuantum == 0) {
+                choice = 2;
+            } else if (remainingQuantum == 0) {
                 currentProcess.setUpdatedQuantum(quantum + 2);
-                timeline.add("Time " + start + " to " + currentTime + ": " + currentProcess.getName()
-                        + " , quantum :  " + quantum + " --> " + currentProcess.getUpdatedQuantum());
                 readyQueue.add(currentProcess);
-                currentProcess = null ;
+                choice = 2;
+            } else {
+                currentProcess.setUpdatedQuantum(quantum + remainingQuantum);
+                readyQueue.add(currentProcess);
+                choice = 1;
             }
-            else // ready queue became non-empty
-            {
-                // Preemptive execution
-                calculateFcaiFactor();
-                while (remainingQuantum > 0 && currentProcess.getBurstTime() > 0) {
-                    updateReadyQueueState(currentTime);
-                    sortReadyQueue();
-                    if (!readyQueue.isEmpty() &&
-                            readyQueue.peek().getFcaiFactor() < currentProcess.getFcaiFactor()) {
-                        break;
-                    }
-                    currentTime++;
-                    remainingQuantum--;
-                    currentProcess.setBurstTime(currentProcess.getBurstTime() - 1);
-                }
 
-                if (currentProcess.getBurstTime() == 0) {
-                    currentProcess.setCompletionTime(currentTime);
-                    timeline.add("Time " + start + " to " + currentTime + ": " + currentProcess.getName() + " --> completed");
-                    currentProcess = null;
-                } else if (remainingQuantum == 0) {
-                    currentProcess.setUpdatedQuantum(quantum + 2);
-                    timeline.add("Time " + start + " to " + currentTime + ": " + currentProcess.getName()
-                            + " , quantum :  " + quantum + " --> " + currentProcess.getUpdatedQuantum());
-                    readyQueue.add(currentProcess);
-                    currentProcess = null ;
-                }
-                else // process has preempted the current process
-                {
-                    currentProcess.setUpdatedQuantum(quantum + remainingQuantum);
-                    timeline.add("Time " + start + " to " + currentTime + ": " + currentProcess.getName()
-                            + " , quantum :  " + quantum + " --> " + currentProcess.getUpdatedQuantum());
-                    readyQueue.add(currentProcess);
-                    currentProcess = null ;
-                }
-                currentProcess = readyQueue.poll();
-            }
+            currentTime += contextSwitchingTime;
         }
+        return executionOrder;
     }
 
     private void calculateV1() {
@@ -157,16 +143,16 @@ public class FCAIScheduler {
         v2 = maxBurstTime / 10.0;
     }
 
-
-    public void printResults(List<Process> processes) {
-
+    public void printResults(List<Process> processes, List<ProcessExecution> executionOrder) {
         timeline.forEach(System.out::println);
 
         // Print individual process results (waiting time, turnaround time)
-        for(Process p : processes){
-            System.out.println("prcocess " + p.getName()
-                    + " : turnaroundTime = " + p.getTurnaroundTime(p.getCompletionTime())
-                    + " , waitingTime = " + p.getWaitingTimeFcai(p.getBurstTime())) ;
+        for (Process p : processes) {
+            int waitTime = p.getWaitingTimeFcai(p.getOriginalBurstTime());
+            int turnaroundTime = p.getTurnaroundTime(p.getCompletionTime());
+            System.out.println("Process: " + p.getName());
+            System.out.println("Waiting Time: " + waitTime);
+            System.out.println("Turnaround Time: " + turnaroundTime + '\n');
         }
 
         double avgWait = calculateAverageWaitingTime(processes);
@@ -181,8 +167,7 @@ public class FCAIScheduler {
         for (Process p : processes) {
             totalWaitingTime += p.getWaitingTimeFcai(p.getOriginalBurstTime());
         }
-        double averageWaitingTime = (double) totalWaitingTime / processes.size();
-        return averageWaitingTime;
+        return (double) totalWaitingTime / processes.size();
     }
 
     public double calculateAverageTurnaroundTime(List<Process> processes) {
@@ -192,6 +177,4 @@ public class FCAIScheduler {
         }
         return (double) totalTurnaroundTime / processes.size();
     }
-
-
 }

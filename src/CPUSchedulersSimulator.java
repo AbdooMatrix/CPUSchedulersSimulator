@@ -7,12 +7,14 @@ import models.ProcessExecution;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
 
 public class CPUSchedulersSimulator {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         ArrayList<Process> processes = new ArrayList<>();
+        Random random = new Random();
 
         System.out.print("Enter number of processes: ");
         int numProcesses = scanner.nextInt();
@@ -20,18 +22,18 @@ public class CPUSchedulersSimulator {
         // Input processes
         for (int i = 0; i < numProcesses; i++) {
             System.out.println("Process " + (i + 1) + ":");
-            System.out.print("Name: ");
+            System.out.print("  Name: ");
             String name = scanner.next();
-            System.out.print("Arrival Time: ");
+            System.out.print("  Arrival Time: ");
             int arrivalTime = scanner.nextInt();
-            System.out.print("Burst Time: ");
+            System.out.print("  Burst Time: ");
             int burstTime = scanner.nextInt();
-            System.out.print("Priority: ");
+            System.out.print("  Priority: ");
             int priority = scanner.nextInt();
-            System.out.print("Color (Hex code, e.g., #FF5733): ");
-            String colorHex = scanner.next();
+            String colorHex = generateRandomColor(random);
             int pid = i + 1; // Generate unique PID
             processes.add(new Process(name, arrivalTime, burstTime, priority, colorHex, pid));
+            System.out.println("-------------------------------------");
         }
 
         System.out.println("Select the Scheduling Algorithm:");
@@ -70,11 +72,11 @@ public class CPUSchedulersSimulator {
 
             case 2:
                 // Use ShortestJobFirstScheduler
-                ShortestJobFirstScheduler shortestJobFirstScheduler = new ShortestJobFirstScheduler(processes,contextSwitchingTime);
+                ShortestJobFirstScheduler shortestJobFirstScheduler = new ShortestJobFirstScheduler(processes, contextSwitchingTime);
                 scheduleName = "Process Execution by Shortest Job First Scheduling";
                 schedule = shortestJobFirstScheduler.schedule();
-                averageWaitingTime=shortestJobFirstScheduler.calculateAverageWaitingTime();
-                averageTurnaroundTime=shortestJobFirstScheduler.calculateAverageTurnaroundTime();
+                averageWaitingTime = shortestJobFirstScheduler.calculateAverageWaitingTime();
+                averageTurnaroundTime = shortestJobFirstScheduler.calculateAverageTurnaroundTime();
                 break;
 
             case 3:
@@ -90,17 +92,22 @@ public class CPUSchedulersSimulator {
                 break;
 
             case 4:
-                // FCAI Scheduling (assumed Round Robin or other method)
-                for(Process p : processes){
+                for (Process p : processes) {
                     System.out.print("Enter Round Robin Quantum for " + p.getName() + " : ");
                     int quantum = scanner.nextInt();
                     p.setUpdatedQuantum(quantum);
                 }
 
-                FCAIScheduler fcaiScheduler = new FCAIScheduler(processes) ;
-                fcaiScheduler.schedule();
-                fcaiScheduler.printResults(processes);
+                FCAIScheduler fcaiScheduler = new FCAIScheduler(processes);
+                scheduleName = "Process Execution by FCAI Scheduling";
+                schedule = fcaiScheduler.schedule(contextSwitchingTime);
+
+                averageWaitingTime = fcaiScheduler.calculateAverageWaitingTime(processes);
+                averageTurnaroundTime = fcaiScheduler.calculateAverageTurnaroundTime(processes);
+
+                fcaiScheduler.printResults(processes, schedule);
                 break;
+
         }
 
         // If there is a valid schedule, pass it to GUI creation
@@ -112,5 +119,11 @@ public class CPUSchedulersSimulator {
                     averageTurnaroundTime
             );
         }
+    }
+
+    // Method to generate random hex color
+    private static String generateRandomColor(Random random) {
+        int nextInt = random.nextInt(0xffffff + 1);
+        return String.format("#%06x", nextInt);
     }
 }

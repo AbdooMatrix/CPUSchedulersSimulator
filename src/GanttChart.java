@@ -1,8 +1,10 @@
+import models.ProcessExecution;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
+import java.util.*;
 import java.util.List;
-import models.ProcessExecution;
 
 public class GanttChart extends JPanel {
     private final List<ProcessExecution> schedule;
@@ -15,7 +17,7 @@ public class GanttChart extends JPanel {
         this.scheduleName = scheduleName;
         this.averageWaitingTime = awt;
         this.averageTurnaroundTime = ata;
-        setBackground(Color.DARK_GRAY); // Revert background to original color
+        setBackground(Color.DARK_GRAY);
     }
 
     @Override
@@ -32,53 +34,65 @@ public class GanttChart extends JPanel {
 
         // Title
         g2d.setColor(Color.RED);
-        g2d.setFont(new Font("Arial", Font.BOLD, 30)); // Bigger and bolder font
-        g2d.drawString("CPU Scheduling Graph", xOffset, 40); // Move to the left side
+        g2d.setFont(new Font("Arial", Font.BOLD, 30));
+        g2d.drawString("CPU Scheduling Graph", xOffset, 40);
 
+        // Calculate max execution time
         int maxTime = 0;
         for (ProcessExecution exec : schedule) {
             maxTime = Math.max(maxTime, exec.startTime + exec.duration);
         }
 
-        // Adjust the preferred size based on the number of processes and max time
+        // Extract unique processes
+        Set<String> uniqueProcesses = new HashSet<>();
+        for (ProcessExecution exec : schedule) {
+            uniqueProcesses.add(exec.processName);
+        }
+        int processCount = uniqueProcesses.size();
+
+        // Adjust panel size
         int panelWidth = xOffset + (maxTime + 1) * timeUnitWidth + 100;
-        int panelHeight = yOffset + schedule.size() * barSpacing + 200;
+        int panelHeight = yOffset + processCount * barSpacing + 200;
         setPreferredSize(new Dimension(panelWidth, panelHeight));
 
-        // Draw Grid Lines
-        g2d.setColor(new Color(100, 100, 100)); // Original grid line color
+        // Draw gridlines and time labels
+        g2d.setColor(new Color(100, 100, 100));
+        g2d.setFont(new Font("Arial", Font.BOLD, 16));
+
         for (int i = 0; i <= maxTime; i++) {
             int xPosition = xOffset + i * timeUnitWidth;
-            g2d.drawLine(xPosition, yOffset - 20, xPosition, yOffset + schedule.size() * barSpacing + 20);
-        }
 
-        // Draw Process Bars and Labels
-        for (int i = 0; i < schedule.size(); i++) {
-            ProcessExecution exec = schedule.get(i);
-            int barStartX = xOffset + exec.startTime * timeUnitWidth;
-            int yPosition = yOffset + i * barSpacing;
+            // Draw gridline
+            g2d.drawLine(xPosition, yOffset - 20, xPosition, yOffset + processCount * barSpacing + 20);
 
-            // Rounded process bar
-            g2d.setColor(exec.color);
-            g2d.fill(new RoundRectangle2D.Double(barStartX, yPosition, exec.duration * timeUnitWidth, barHeight, 10, 10));
-
-            // Process Label in front of the lane
+            // Draw centered time label
             g2d.setColor(Color.WHITE);
-            g2d.setFont(new Font("Arial", Font.BOLD, 16)); // Bigger and bolder font
-            g2d.drawString("Process: " + exec.processName, xOffset - 90, yPosition + barHeight / 2 + 5);
-
-            // Process Label on the bar
-            g2d.setColor(Color.BLACK);
-            g2d.drawString(exec.processName, barStartX + 5, yPosition + barHeight / 2 + 5);
+            g2d.drawString(String.valueOf(i), xPosition - 5, yOffset + processCount * barSpacing + 30);
         }
 
-        // Time Axis
-        g2d.setColor(Color.WHITE);
-        g2d.setFont(new Font("Arial", Font.BOLD, 16)); // Bigger and bolder font
-        for (int i = 0; i <= maxTime; i++) {
-            int xPosition = xOffset + i * timeUnitWidth;
-            g2d.drawLine(xPosition, yOffset - 10, xPosition, yOffset + schedule.size() * barSpacing);
-            g2d.drawString(String.valueOf(i), xPosition - 5, yOffset + schedule.size() * barSpacing + 20);
+        // Draw process bars and labels
+        int processIndex = 0;
+        for (String processName : uniqueProcesses) {
+            for (ProcessExecution exec : schedule) {
+                if (exec.processName.equals(processName)) {
+                    int barStartX = xOffset + exec.startTime * timeUnitWidth;
+                    int yPosition = yOffset + processIndex * barSpacing;
+
+                    // Draw rounded process bar
+                    g2d.setColor(exec.color);
+                    g2d.fill(new RoundRectangle2D.Double(barStartX, yPosition, exec.duration * timeUnitWidth, barHeight, 10, 10));
+
+                    // Draw process name inside the bar
+                    g2d.setColor(Color.BLACK);
+                    g2d.drawString(exec.processName, barStartX + 5, yPosition + barHeight / 2 + 5);
+                }
+            }
+
+            // Draw process label to the left of the lane
+            g2d.setColor(Color.WHITE);
+            g2d.drawString("Process: " + processName, xOffset - 90, yOffset + processIndex * barSpacing + barHeight / 2 + 5);
+
+            processIndex++;
         }
     }
 
@@ -86,87 +100,88 @@ public class GanttChart extends JPanel {
         JFrame frame = new JFrame("Scheduling Graph");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        // Create the main panel
-        JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBackground(Color.DARK_GRAY);
-
-        // Create the grid panel
         GanttChart gridPanel = new GanttChart(schedule, scheduleName, awt, ata);
         JScrollPane scrollPane = new JScrollPane(gridPanel);
-        scrollPane.setPreferredSize(new Dimension(1200, 800)); // Ensure scroll pane has a preferred size
+        scrollPane.setPreferredSize(new Dimension(1200, 800));
 
-        // Create the legend panel
-        JPanel legendPanel = new JPanel();
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(Color.DARK_GRAY);
+        mainPanel.add(scrollPane, BorderLayout.CENTER);
+
+        JPanel statsPanel = createStatsPanel(scheduleName, awt, ata);
+        JPanel legendPanel = createLegendPanel(schedule);
+
+        mainPanel.add(statsPanel, BorderLayout.SOUTH);
+        mainPanel.add(legendPanel, BorderLayout.EAST);
+
+        frame.add(mainPanel);
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.setVisible(true);
+    }
+
+    private static JPanel createStatsPanel(String scheduleName, double awt, double ata) {
+        JPanel statsPanel = new JPanel();
+        statsPanel.setBackground(Color.DARK_GRAY);
+        statsPanel.setLayout(new BoxLayout(statsPanel, BoxLayout.Y_AXIS));
+        statsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        JLabel statsLabel = new JLabel("Statistics");
+        statsLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        statsLabel.setForeground(Color.RED);
+        statsPanel.add(statsLabel);
+
+        statsPanel.add(createLabel("Schedule Name: " + scheduleName));
+        statsPanel.add(createLabel("Average Waiting Time: " + String.format("%.2f", awt)));
+        statsPanel.add(createLabel("Average Turnaround Time: " + String.format("%.2f", ata)));
+
+        return statsPanel;
+    }
+
+    private static JPanel createLegendPanel(List<ProcessExecution> schedule) {
+        JPanel legendPanel = new JPanel(new BorderLayout());
         legendPanel.setBackground(Color.DARK_GRAY);
-        legendPanel.setLayout(new BorderLayout());
-        legendPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 0, 20)); // Add space above and after the legend panel
+        legendPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 0, 20));
 
         JLabel titleLabel = new JLabel("Processes Information");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 20)); // Bigger and bolder font
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
         titleLabel.setForeground(Color.RED);
-        titleLabel.setHorizontalAlignment(SwingConstants.CENTER); // Center align the title label
+        titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         legendPanel.add(titleLabel, BorderLayout.NORTH);
 
         JPanel processListPanel = new JPanel();
         processListPanel.setBackground(Color.DARK_GRAY);
         processListPanel.setLayout(new BoxLayout(processListPanel, BoxLayout.Y_AXIS));
 
+        Set<String> uniqueProcesses = new HashSet<>();
         for (ProcessExecution exec : schedule) {
-            JPanel processInfoPanel = new JPanel();
-            processInfoPanel.setBackground(Color.DARK_GRAY);
-            processInfoPanel.setLayout(new BoxLayout(processInfoPanel, BoxLayout.X_AXIS)); // Change to BoxLayout
+            if (uniqueProcesses.add(exec.processName)) {
+                JPanel processInfoPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+                processInfoPanel.setBackground(Color.DARK_GRAY);
 
-            JLabel colorLabel = new JLabel();
-            colorLabel.setOpaque(true);
-            colorLabel.setBackground(exec.color);
-            colorLabel.setPreferredSize(new Dimension(15, 15));
+                JLabel colorBox = new JLabel();
+                colorBox.setOpaque(true);
+                colorBox.setBackground(exec.color);
+                colorBox.setPreferredSize(new Dimension(20, 20));
 
-            JLabel processLabel = new JLabel(String.format("Name: %s | PID: %s | Priority: %s", exec.processName, exec.pid, exec.priority));
-            processLabel.setFont(new Font("Arial", Font.BOLD, 16)); // Bigger and bolder font
-            processLabel.setForeground(Color.WHITE);
+                JLabel processLabel = new JLabel(String.format(" Name: %s | PID: %s | Priority: %s",
+                        exec.processName, exec.pid, exec.priority));
+                processLabel.setFont(new Font("Arial", Font.BOLD, 16));
+                processLabel.setForeground(Color.WHITE);
 
-            processInfoPanel.add(colorLabel);
-            processInfoPanel.add(Box.createRigidArea(new Dimension(10, 0))); // Add space between color and text
-            processInfoPanel.add(processLabel);
-
-            processListPanel.add(processInfoPanel);
+                processInfoPanel.add(colorBox);
+                processInfoPanel.add(processLabel);
+                processListPanel.add(processInfoPanel);
+            }
         }
 
         legendPanel.add(new JScrollPane(processListPanel), BorderLayout.CENTER);
+        return legendPanel;
+    }
 
-        // Create the statistics panel
-        JPanel statsPanel = new JPanel();
-        statsPanel.setBackground(Color.DARK_GRAY);
-        statsPanel.setLayout(new BoxLayout(statsPanel, BoxLayout.Y_AXIS));
-        statsPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Add space around the statistics panel
-
-        JLabel statsLabel = new JLabel("Statistics");
-        statsLabel.setFont(new Font("Arial", Font.BOLD, 20)); // Bigger and bolder font
-        statsLabel.setForeground(Color.RED);
-        statsPanel.add(statsLabel);
-
-        JLabel scheduleNameLabel = new JLabel("Schedule Name: " + scheduleName);
-        scheduleNameLabel.setFont(new Font("Arial", Font.BOLD, 16)); // Bigger and bolder font
-        scheduleNameLabel.setForeground(Color.WHITE);
-        statsPanel.add(scheduleNameLabel);
-
-        JLabel awtLabel = new JLabel("Average Waiting Time: " + String.format("%.2f", awt)); // Expanded abbreviation
-        awtLabel.setFont(new Font("Arial", Font.BOLD, 16)); // Bigger and bolder font
-        awtLabel.setForeground(Color.WHITE);
-        statsPanel.add(awtLabel);
-
-        JLabel ataLabel = new JLabel("Average Turnaround Time: " + String.format("%.2f", ata)); // Expanded abbreviation
-        ataLabel.setFont(new Font("Arial", Font.BOLD, 16)); // Bigger and bolder font
-        ataLabel.setForeground(Color.WHITE);
-        statsPanel.add(ataLabel);
-
-        // Add components to the main panel
-        mainPanel.add(scrollPane, BorderLayout.CENTER);
-        mainPanel.add(statsPanel, BorderLayout.SOUTH);
-        mainPanel.add(legendPanel, BorderLayout.EAST);
-
-        frame.add(mainPanel);
-        frame.setExtendedState(JFrame.MAXIMIZED_BOTH); // Set to fullscreen
-        frame.setVisible(true);
+    private static JLabel createLabel(String text) {
+        JLabel label = new JLabel(text);
+        label.setFont(new Font("Arial", Font.BOLD, 16));
+        label.setForeground(Color.WHITE);
+        return label;
     }
 }
