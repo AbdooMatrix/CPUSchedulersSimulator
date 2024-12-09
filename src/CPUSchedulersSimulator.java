@@ -80,15 +80,15 @@ public class CPUSchedulersSimulator {
                 break;
 
             case 3:
-                // Use ShortestJobFirstScheduler
+                List<Process>exc_order=new ArrayList<>();
                 ShortestRemainingTimeFirstScheduler shortestRemainingTimeFirstScheduler = new ShortestRemainingTimeFirstScheduler();
                 scheduleName = "Process Execution by Shortest Remaining Time First Scheduling";
                 schedule = shortestRemainingTimeFirstScheduler.schedule(processes, contextSwitchingTime);
                 averageWaitingTime = shortestRemainingTimeFirstScheduler.calculateAverageWaitingTime(processes);
                 averageTurnaroundTime = shortestRemainingTimeFirstScheduler.calculateAverageTurnaroundTime(processes);
-
+                exc_order= shortestRemainingTimeFirstScheduler.executionOrder2;
                 // Print results (with execution order passed in)
-                shortestRemainingTimeFirstScheduler.printResults(processes, schedule);
+                shortestRemainingTimeFirstScheduler.printResults(exc_order, schedule);
                 break;
 
             case 4:

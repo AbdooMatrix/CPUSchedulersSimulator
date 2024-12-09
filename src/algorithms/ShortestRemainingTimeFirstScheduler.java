@@ -11,6 +11,7 @@ import java.util.PriorityQueue;
 public class ShortestRemainingTimeFirstScheduler {
     public static int MAX_WAIT_TIME=20;
     // Scheduling method: Handles only scheduling logic
+    public List<Process> executionOrder2 = new ArrayList<>();
     public List<ProcessExecution> schedule(List<Process> processes, int contextSwitchingTime) {
         // Sort processes by arrival time initially
         processes.sort((p1, p2) -> Integer.compare(p1.getArrivalTime(), p2.getArrivalTime()));
@@ -38,8 +39,10 @@ public class ShortestRemainingTimeFirstScheduler {
                     process.setBurstTime(0);
                     process.setCompletionTime(currentTime);
                     executionOrder.add(new ProcessExecution(process.getName(), 1,process.getColor(),process.getPid(),process.getPriority(),currentTime));
+                    executionOrder2.add(process);
                     completed++;
                     queue.remove(process);
+
                 }
 
 
@@ -56,6 +59,14 @@ public class ShortestRemainingTimeFirstScheduler {
             if (lastProcess != null && !lastProcess.equals(currentProcess)) {
                 currentTime += contextSwitchingTime;
             }
+            executionOrder.add(new ProcessExecution(
+                    currentProcess.getName(),
+                    1, // Each unit of execution is 1
+                    currentProcess.getColor(),
+                    currentProcess.getPid(),
+                    currentProcess.getPriority(),
+                    currentTime
+            ));
 
             // Add ProcessExecution entry for current process
 
@@ -65,14 +76,15 @@ public class ShortestRemainingTimeFirstScheduler {
             if (currentProcess.getBurstTime() == 0) {
                 currentProcess.setCompletionTime(currentTime);
                 completed++;
-                executionOrder.add(new ProcessExecution(
-                        currentProcess.getName(),
-                        1, // Each unit of execution is 1
-                        currentProcess.getColor(),
-                        currentProcess.getPid(),
-                        currentProcess.getPriority(),
-                        currentTime
-                ));
+                executionOrder2.add(currentProcess);
+//                executionOrder.add(new ProcessExecution(
+//                        currentProcess.getName(),
+//                        1, // Each unit of execution is 1
+//                        currentProcess.getColor(),
+//                        currentProcess.getPid(),
+//                        currentProcess.getPriority(),
+//                        currentTime
+//                ));
 
             } else {
                 queue.add(currentProcess);
@@ -123,3 +135,4 @@ public class ShortestRemainingTimeFirstScheduler {
         return (double) totalTurnaroundTime / processes.size();
     }
 }
+
