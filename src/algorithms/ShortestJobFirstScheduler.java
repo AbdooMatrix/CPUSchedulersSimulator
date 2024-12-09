@@ -80,13 +80,15 @@ public class ShortestJobFirstScheduler {
             ));
 
             // Simulate process execution and context switching
-            int startExecutionTime = isFirstProcess ? currentTime : currentTime + contextSwitchTime;
-            int completionTime = startExecutionTime + selectedProcess.getBurstTime();
+              int completionTime =  currentTime + selectedProcess.getBurstTime();
 
             selectedProcess.setCompletionTime(completionTime);
 
             // Update current time
             currentTime = completionTime;
+            if(!isFirstProcess){
+                currentTime+=contextSwitchTime;
+            }
              // Update the flag to indicate that the first process has been executed
             isFirstProcess = false;
 
