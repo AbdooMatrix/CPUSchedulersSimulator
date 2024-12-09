@@ -13,22 +13,24 @@ public class ShortestJobFirstScheduler {
     private List<Process> processList;
     private int contextSwitchTime;
     private static final int MAX_WAIT_TIME = 20; // Define maximum wait time to avoid starvation
+    private List<Process> executionOrder;
+    //private List<ProcessExecution> executionOrder2;
 
     public ShortestJobFirstScheduler(List<Process> processList, int contextSwitchTime) {
         this.processList = processList;
         this.contextSwitchTime = contextSwitchTime;
     }
 
-    public List<ProcessExecution> schedule() {
+    public List<ProcessExecution>  schedule() {
         // Sort processes by arrival time first, then burst time
         processList.sort(Comparator.comparingInt(Process::getArrivalTime).thenComparingInt(Process::getBurstTime).thenComparing(Process::getPriority));
 
         int currentTime = 0;
         int totalWaitingTime = 0;
         int totalTurnaroundTime = 0;
-        List<Process> executionOrder = new ArrayList<>();
-        List<ProcessExecution> executionOrder2 = new ArrayList<>();
-          boolean isFirstProcess = true; // Add a flag to track the first process
+         executionOrder = new ArrayList<>();
+        List<ProcessExecution>  executionOrder2 = new ArrayList<>();
+        boolean isFirstProcess = true; // Add a flag to track the first process
 
         while (!processList.isEmpty()) {
             // Filter processes that have arrived by the current time
@@ -80,17 +82,17 @@ public class ShortestJobFirstScheduler {
             ));
 
             // Simulate process execution and context switching
-              int completionTime =  currentTime + selectedProcess.getBurstTime();
+            int completionTime =  currentTime + selectedProcess.getBurstTime();
 
             selectedProcess.setCompletionTime(completionTime);
 
             // Update current time
             currentTime = completionTime;
-           
-                currentTime+=contextSwitchTime;
-            
-           
-          
+
+            currentTime+=contextSwitchTime;
+
+
+
 
             // Calculate waiting and turnaround times
             int waitingTime = selectedProcess.getWaitingTime(completionTime);
@@ -107,12 +109,11 @@ public class ShortestJobFirstScheduler {
         }
 
         // Print average waiting and turnaround times
-        int numProcesses = executionOrder.size();
-        double avgWaitingTime = (double) totalWaitingTime / numProcesses;
-        double avgTurnaroundTime = (double) totalTurnaroundTime / numProcesses;
+        // Calculate and print average waiting time
+        System.out.println("Average Waiting Time: " + calculateAverageWaitingTime());
 
-        System.out.println("Average Waiting Time: " + avgWaitingTime);
-        System.out.println("Average Turnaround Time: " + avgTurnaroundTime);
+        // Calculate and print average turnaround time
+        System.out.println("Average Turnaround Time: " + calculateAverageTurnaroundTime());
 
         // Print execution order
         System.out.println("Execution Order: ");
@@ -121,4 +122,24 @@ public class ShortestJobFirstScheduler {
         return executionOrder2;
 
     }
+    public double calculateAverageWaitingTime() {
+        int totalWaitingTime = 0;
+        for (Process process : executionOrder) {
+            totalWaitingTime += process.getWaitingTime(process.getCompletionTime());
+        }
+        return (double) totalWaitingTime / executionOrder.size();
+    }
+
+    // Public method to calculate average turnaround time
+    public double calculateAverageTurnaroundTime() {
+        int totalTurnaroundTime = 0;
+        for (Process process : executionOrder) {
+            totalTurnaroundTime += process.getTurnaroundTime(process.getCompletionTime());
+        }
+        return (double) totalTurnaroundTime / executionOrder.size();
+    }
+
+
+
+
 }
