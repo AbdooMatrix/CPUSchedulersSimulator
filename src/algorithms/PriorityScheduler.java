@@ -59,8 +59,9 @@ public class PriorityScheduler {
         // Display the order of execution
         System.out.println("Process Execution Order:");
         for (ProcessExecution pe : executionOrder) {
-            System.out.println(pe.getProcessName() + " -> " + pe.getProcessName());
+            System.out.print(pe.getProcessName() + " -> ");
         }
+        System.out.println("end");
 
         // Display individual process metrics
         for (Process p : processes) {
