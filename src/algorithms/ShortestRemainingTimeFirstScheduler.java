@@ -7,8 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.PriorityQueue;
 
-public class ShortestRemainingTimeFirstScheduler {
 
+public class ShortestRemainingTimeFirstScheduler {
+    public static int MAX_WAIT_TIME=20;
     // Scheduling method: Handles only scheduling logic
     public List<ProcessExecution> schedule(List<Process> processes, int contextSwitchingTime) {
         // Sort processes by arrival time initially
@@ -29,6 +30,19 @@ public class ShortestRemainingTimeFirstScheduler {
                     }
                     queue.add(process);
                 }
+                if (process.getWaitingTime(currentTime) > MAX_WAIT_TIME && process.getBurstTime() > 0) {
+                    // Immediate execution for the starved process
+                    System.out.println("Process " + process.getName() + " starved! Executing immediately.");
+                    currentTime += contextSwitchingTime;
+                    currentTime += process.getBurstTime();
+                    process.setBurstTime(0);
+                    process.setCompletionTime(currentTime);
+                    executionOrder.add(new ProcessExecution(process.getName(), 1,process.getColor(),process.getPid(),process.getPriority(),currentTime));
+                    completed++;
+                    queue.remove(process);
+                }
+
+
             }
 
             if (queue.isEmpty()) {
@@ -44,14 +58,6 @@ public class ShortestRemainingTimeFirstScheduler {
             }
 
             // Add ProcessExecution entry for current process
-            executionOrder.add(new ProcessExecution(
-                    currentProcess.getName(),
-                    1, // Each unit of execution is 1
-                    currentProcess.getColor(),
-                    currentProcess.getPid(),
-                    currentProcess.getPriority(),
-                    currentTime
-            ));
 
             currentProcess.setBurstTime(currentProcess.getBurstTime() - 1);
             currentTime++;
@@ -59,6 +65,15 @@ public class ShortestRemainingTimeFirstScheduler {
             if (currentProcess.getBurstTime() == 0) {
                 currentProcess.setCompletionTime(currentTime);
                 completed++;
+                executionOrder.add(new ProcessExecution(
+                        currentProcess.getName(),
+                        1, // Each unit of execution is 1
+                        currentProcess.getColor(),
+                        currentProcess.getPid(),
+                        currentProcess.getPriority(),
+                        currentTime
+                ));
+
             } else {
                 queue.add(currentProcess);
             }
@@ -72,7 +87,7 @@ public class ShortestRemainingTimeFirstScheduler {
     // Printing results and calling average calculation methods
     public void printResults(List<Process> processes, List<ProcessExecution> executionOrder) {
         System.out.println("Process Execution Order:");
-        executionOrder.forEach(pe -> System.out.println(pe.getProcessName()));
+        executionOrder.forEach(pe -> System.out.println(pe.processName));
 
         System.out.println("\nProcess Details:");
         for (Process p : processes) {
