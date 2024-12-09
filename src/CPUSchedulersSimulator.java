@@ -73,6 +73,8 @@ public class CPUSchedulersSimulator {
                 ShortestJobFirstScheduler shortestJobFirstScheduler = new ShortestJobFirstScheduler(processes,contextSwitchingTime);
                 scheduleName = "Process Execution by Shortest Job First Scheduling";
                 schedule = shortestJobFirstScheduler.schedule();
+                averageWaitingTime=shortestJobFirstScheduler.calculateAverageWaitingTime();
+                averageTurnaroundTime=shortestJobFirstScheduler.calculateAverageTurnaroundTime();
                 break;
 
             case 3:
