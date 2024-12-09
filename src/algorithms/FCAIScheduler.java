@@ -84,6 +84,7 @@ public class FCAIScheduler {
             while (currentProcess.getBurstTime() > 0 && readyQueue.isEmpty() && remainingQuantum > 0) {
                 currentTime++;
                 remainingQuantum--;
+                currentProcess.setBurstTime(currentProcess.getBurstTime() - 1);
                 updateReadyQueueState(currentTime);
             }
 
@@ -95,7 +96,7 @@ public class FCAIScheduler {
                 currentProcess.setUpdatedQuantum(quantum + 2);
                 timeline.add("Time " + start + " to " + currentTime + ": " + currentProcess.getName());
                 readyQueue.add(currentProcess);
-                currentProcess = readyQueue.poll();
+                currentProcess = null ;
             }
             else // ready queue became non-empty
             {
@@ -120,10 +121,14 @@ public class FCAIScheduler {
                     timeline.add("Time " + start + " to " + currentTime + ": " + currentProcess.getName());
                     currentProcess.setUpdatedQuantum(quantum + 2);
                     readyQueue.add(currentProcess);
-                } else {
+                    currentProcess = null ;
+                }
+                else // process has preempted the current process
+                {
                     timeline.add("Time " + start + " to " + currentTime + ": " + currentProcess.getName());
                     currentProcess.setUpdatedQuantum(quantum + remainingQuantum);
                     readyQueue.add(currentProcess);
+                    currentProcess = null ;
                 }
                 currentProcess = readyQueue.poll();
             }
