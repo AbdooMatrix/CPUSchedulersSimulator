@@ -86,11 +86,11 @@ public class ShortestJobFirstScheduler {
 
             // Update current time
             currentTime = completionTime;
-            if(!isFirstProcess){
+           
                 currentTime+=contextSwitchTime;
-            }
-             // Update the flag to indicate that the first process has been executed
-            isFirstProcess = false;
+            
+           
+          
 
             // Calculate waiting and turnaround times
             int waitingTime = selectedProcess.getWaitingTime(completionTime);
